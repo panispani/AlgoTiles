@@ -11,6 +11,7 @@ public class ImageProcessing {
      */
     public static int TILES_ROW = 10;
     public static int TILES_COL = 5;
+    public static int NUM_COLORS = 17; // 7 + 10 numbers
 
     /*
      * set every time, specific to each capture
@@ -26,7 +27,11 @@ public class ImageProcessing {
      */
     public static int[] run(BufferedImage image) {
         BufferedImage[] tiles = splitImage(image);
-        return null;
+        int[] commands = new int[tiles.length];
+        for(int i = 0; i < tiles.length; i++) {
+            commands[i] = getCommand(tiles[i]);
+        }
+        return commands;
     }
 
     /*
@@ -58,6 +63,44 @@ public class ImageProcessing {
         test(tiles);
         return tiles;
     }
+
+    /*
+     * Returns command number corresponding to input image tile
+     */
+    private static int getCommand(BufferedImage tile) {
+        if(tile == null) {
+            System.out.println("Input image is null");
+        }
+        int[] frequency = new int[NUM_COLORS];
+        int color;
+        int mostFrequent = 0;
+        int maxFrequency = 0;
+        for(int x = 0; x < tileWidth; x++) {
+            for(int y = 0; y < tileHeight; y++) {
+                color = tile.getRGB(x, y);
+                color = getSimpleColor(color);
+                /* hanlde
+                if(color == WHITE || color == BLACK) {
+                    handle  
+                }
+                */
+                frequency[color]++;
+                if(frequency[color] > maxFrequency) {
+                    mostFrequent = color;
+                    maxFrequency = frequency[color];
+                } 
+            }
+        }
+        return mostFrequent;
+    }
+
+    /*
+     * Gets input hex color and returns category of it
+     * Blue, Green, Red etc
+     */
+    private static int getSimpleColor(int hex) {
+        return 0;
+    } 
 
     /*
      * Functions for testing purposes
