@@ -12,6 +12,16 @@ public class ImageProcessing {
     public static int TILES_ROW = 10;
     public static int TILES_COL = 5;
     public static int NUM_COLORS = 17; // 7 + 10 numbers
+    // enum would be better
+    public static int WHITE = 0x1;      // number 
+    public static int BLACK = 0x2;     // end
+    public static int RED = 0x3;       // for
+    public static int GREEN = 0x4;     // move
+    public static int BLUE = 0x5;      // left
+    public static int YELLOW = 0x6;    //right
+    public static int PINK = 0x7;      // if
+    public static int LIGHTBLUE = 0x8; // else
+    public static int GREY = 0x9;      // beads
 
     /*
      * set every time, specific to each capture
@@ -79,11 +89,6 @@ public class ImageProcessing {
             for(int y = 0; y < tileHeight; y++) {
                 color = tile.getRGB(x, y);
                 color = getSimpleColor(color);
-                /* hanlde
-                if(color == WHITE || color == BLACK) {
-                    handle  
-                }
-                */
                 frequency[color]++;
                 if(frequency[color] > maxFrequency) {
                     mostFrequent = color;
@@ -91,7 +96,18 @@ public class ImageProcessing {
                 } 
             }
         }
+        if(mostFrequent == WHITE || mostFrequent == GREY) {
+            return countBeads(tile);
+        }
         return mostFrequent;
+    }
+
+    /*
+     * Counts beads in input image using
+     * Hough Circle Trasform
+     */ 
+    public static int countBeads(BufferedImage image) {
+        return 0;
     }
 
     /*
