@@ -79,16 +79,16 @@ public class Simulate {
             }
             switch(player.type) {
                 case PLAYERUP:
-                    images[player.x][player.y].setImageBitmap(player0);
+                    MainActivity.images[player.x][player.y].setImageBitmap(MainActivity.player0);
                     break;
                 case PLAYERDOWN:
-                    images[player.x][player.y].setImageBitmap(player1);
+                    MainActivity.images[player.x][player.y].setImageBitmap(MainActivity.player1);
                     break;
                 case PLAYERLEFT:
-                    images[player.x][player.y].setImageBitmap(player2);
+                    MainActivity.images[player.x][player.y].setImageBitmap(MainActivity.player2);
                     break;
                 case PLAYERRIGHT:
-                    images[player.x][player.y].setImageBitmap(player3);
+                    MainActivity.images[player.x][player.y].setImageBitmap(MainActivity.player3);
                     break;
 
             }

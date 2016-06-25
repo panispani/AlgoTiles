@@ -1,5 +1,7 @@
 package com.example.user.myapplication;
 
+import android.graphics.Bitmap;
+
 import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
@@ -16,18 +18,7 @@ public class ImageProcessing {
     public static int TILES_ROW = 10;
     public static int TILES_COL = 5;
     public static int NUM_COLORS = 17; // 7 + 10 numbers
-    // enum would be better
-    /*
-    public static int WHITE = 0x1;      // number 
-    public static int BLACK = 0x2;     // end
-    public static int RED = 0x3;       // for
-    public static int GREEN = 0x4;     // move
-    public static int BLUE = 0x5;      // left
-    public static int YELLOW = 0x6;    //right
-    public static int PINK = 0x7;      // if
-    public static int LIGHTBLUE = 0x8; // else
-    public static int GREY = 0x9;      // beads
-*/
+
     public static enum ourColors{
         Black,
         White,
@@ -52,9 +43,9 @@ public class ImageProcessing {
      *  Return array of commands from input image
      *  Assume fullscreen, resinfg could be done later
      */
-    public static ourColors[] run(BufferedImage image) {
+    public static int[] run(Bitmap image) {
         BufferedImage[] tiles = splitImage(image);
-        ourColors[] commands = new ourColors[tiles.length];
+        int[] commands = new ourColors[tiles.length];
         for(int i = 0; i < tiles.length; i++) {
             System.out.print(i+"\t");
             commands[i] = getCommand(tiles[i]);
@@ -183,7 +174,7 @@ public class ImageProcessing {
         if (hue < 330)  return ourColors.Magenta;
         return ourColors.Red;
     }
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         File input = new File("sample.jpg");
         try {
             BufferedImage image = ImageIO.read(input);
@@ -192,5 +183,5 @@ public class ImageProcessing {
             e.printStackTrace();
             System.out.println("Error reading input image");
         }
-    }
+    }*/
 }

@@ -16,7 +16,17 @@ import java.util.Random;
 
 public class MainActivity extends Activity {
     private static final int CAMERA_REQUEST = 1888;
-    private ImageView imageView;
+    private static ImageView imageView;
+    // Game element mappings
+    public static final int BOMB = 1;
+    public static final int GRASS = 2;
+    public static final int ROCK = 3;
+    public static final int FLAG = 4;
+    public static final int PLAYERUP = 5;
+    public static final int PLAYERLEFT = 6;
+    public static final int PLAYERDOWN = 7;
+    public static final int PLAYERRIGHT = 8;
+    private static int[] commands;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +50,7 @@ public class MainActivity extends Activity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fun(0);
+                Simulate.simulate(grid, commands);
             }
         });
     }
@@ -59,8 +69,7 @@ public class MainActivity extends Activity {
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
-            int[] commands = ImageProcessing.run(photo);
-            Simulate.simulate(grid, commands);
+            commands = ImageProcessing.run(photo);
         }
     }
     int width = 10;
@@ -68,15 +77,15 @@ public class MainActivity extends Activity {
     RelativeLayout r1;
     ImageView temp;
     int grid[][];
-    Bitmap bomb;
-    Bitmap grass;
-    Bitmap rock;
-    Bitmap player0;
-    Bitmap player1;
-    Bitmap player2;
-    Bitmap player3;
-    Bitmap flag;
-    ImageView[][] images;
+    static Bitmap bomb;
+    static Bitmap grass;
+    static Bitmap rock;
+    static Bitmap player0;
+    static Bitmap player1;
+    static Bitmap player2;
+    static Bitmap player3;
+    static Bitmap flag;
+    static ImageView[][] images;
 
     public void start(){
         // grid
@@ -108,26 +117,26 @@ public class MainActivity extends Activity {
 
 
         player0 = BitmapFactory.decodeResource(this.getResources(),R.drawable.player0);
-        player0 = Bitmap.createScaledBitmap(player0,size/height,size/width,false);
+        player0 = Bitmap.createScaledBitmap(player0, size / height,size / width, false);
 
         player1 = BitmapFactory.decodeResource(this.getResources(),R.drawable.player1);
-        player1 = Bitmap.createScaledBitmap(player1,size/height,size/width,false);
+        player1 = Bitmap.createScaledBitmap(player1, size/height,size/width, false);
 
         player2 = BitmapFactory.decodeResource(this.getResources(),R.drawable.player2);
-        player2 = Bitmap.createScaledBitmap(player2,size/height,size/width,false);
+        player2 = Bitmap.createScaledBitmap(player2, size / height, size / width, false);
 
-        player3 = BitmapFactory.decodeResource(this.getResources(),R.drawable.player3);
-        player3 = Bitmap.createScaledBitmap(player3,size/height,size/width,false);
+        player3 = BitmapFactory.decodeResource(this.getResources(), R.drawable.player3);
+        player3 = Bitmap.createScaledBitmap(player3, size / height, size / width, false);
 
         flag = BitmapFactory.decodeResource(this.getResources(),R.drawable.flag);
-        flag = Bitmap.createScaledBitmap(flag,size/height,size/width,false);
+        flag = Bitmap.createScaledBitmap(flag, size / height, size / width, false);
 
         for (int x = 0; x < height; x++){
             for (int y = 0; y < width; y++){
                 temp = new ImageView(this);
 
-                temp.setX(x*size/(float)height);
-                temp.setY(y*size/(float)width);
+                temp.setX(x *size / (float)height);
+                temp.setY(y * size / (float)width);
 
                 if (grid [x][y] == BOMB){
                     temp.setImageBitmap(bomb);
@@ -136,7 +145,7 @@ public class MainActivity extends Activity {
                     temp.setImageBitmap(rock);
                 }
                 // default player is looking up
-                if (grid [x][y] == PLAYER){
+                if (grid [x][y] == PLAYERUP){
                     temp.setImageBitmap(player0);
                 }
 
@@ -148,8 +157,8 @@ public class MainActivity extends Activity {
                     temp.setImageBitmap(grass);
                 }
 
-                images[x][y]=temp;
-                images[x][y].setPadding(1,1,1,1);
+                images[x][y] = temp;
+                images[x][y].setPadding(1 , 1, 1, 1);
                 images[x][y].setBackgroundColor(Color.BLACK);
 
                 r1.addView(temp);
