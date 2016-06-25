@@ -62,8 +62,7 @@ public class MainActivity extends Activity {
     }
     @Override
     protected void onResume(){
-
-        super.onStart();
+        super.onResume();;
 
     }
 
@@ -101,8 +100,8 @@ public class MainActivity extends Activity {
         for (int x=0; x < height; x++){
             for (int y = 0; y < width; y++){
 
-                //int i1 = (r.nextInt(3));
-                Array [x][y] = grassC;
+                int i1 = (r.nextInt(3));
+                Array [x][y] = i1;
             };
         };
         Array[0][0]=playerC;
@@ -366,87 +365,79 @@ public class MainActivity extends Activity {
     }
 
     public int validMoveRight(int z, int move){
-
+        if(playerX+z>=width){
+            return 3;
+        }
         if(isGrass(playerY, playerX + z)){
             if (z==move){return 0;}
             else
                 z++;
-            validMoveRight(z, move);
+            return validMoveRight(z, move);
         }
-        if (isRock(playerY, playerX)){
-            if (z==move){return 1;}
-            else
-                z++;
-            validMoveRight(z, move);
+        if (isRock(playerY, playerX+z)){
+            return 1;
         }
-        if (isBomb(playerY, playerX)){
+        if (isBomb(playerY, playerX+z)){
             return 2;
         }
-        else{
-            return 2;}
+        return -1;
 
     }
     public int validMoveLeft(int z, int move){
-
+        if(playerX-z<0){
+            return 3;
+        }
         if(isGrass(playerY, playerX - z)){
             if (z==move){return 0;}
             else
                 z--;
-            validMoveLeft(z, move);
+            return validMoveLeft(z, move);
         }
-        if (isRock(playerY, playerX)){
-            if (z==move){return 1;}
-            else
-                z--;
-            validMoveLeft(z, move);
+        if (isRock(playerY, playerX- z)){
+           return 1;
         }
-        if (isBomb(playerY, playerX)){
+        if (isBomb(playerY, playerX- z)){
             return 2;
         }
-        else{
-            return 2;}
+        return -1;
 
     }
     public int validMoveUp(int z, int move){
-
+        if(playerY-z<0){
+            return 3;
+        }
         if(isGrass(playerY - z, playerX)){
             if (z==move){return 0;}
             else
                 z--;
-            validMoveUp(z, move);
+            return validMoveUp(z, move);
         }
-        if (isRock(playerY, playerX)){
-            if (z==move){return 1;}
-            else
-                z--;
-            validMoveUp(z, move);
+        if (isRock(playerY- z, playerX)){
+            return 1;
         }
-        if (isBomb(playerY, playerX)){
+        if (isBomb(playerY- z, playerX)){
             return 2;
         }
-        else{
-            return 2;}
+        return -1;
 
     }
     public int validMoveDown(int z, int move){
-
+        if(playerY+z>=height){
+            return 3;
+        }
         if(isGrass(playerY + z, playerX)){
             if (z==move){return 0;}
             else
                 z++;
-            validMoveUp(z, move);
+            return validMoveUp(z, move);
         }
-        if (isRock(playerY, playerX)){
-            if (z==move){return 1;}
-            else
-                z++;
-            validMoveUp(z, move);
+        if (isRock(playerY+ z, playerX)){
+            return 1;
         }
-        if (isBomb(playerY, playerX)){
+        if (isBomb(playerY+ z, playerX)){
             return 2;
         }
-        else{
-            return 2;}
+        return -1;
 
     }
 }
