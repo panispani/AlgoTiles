@@ -1,7 +1,7 @@
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
-import java.io.*;
-import java.awt.*;
+package com.example.user.PuzzleCode;
+
+import android.graphics.Bitmap;
+import android.graphics.Color;
 
 public class ImageProcessing {
 
@@ -12,17 +12,19 @@ public class ImageProcessing {
     public static int TILES_ROW = 10;
     public static int TILES_COL = 5;
     public static int NUM_COLORS = 17; // 7 + 10 numbers
-    // enum would be better
-    public static int WHITE = 0x1;      // number 
-    public static int BLACK = 0x2;     // end
-    public static int RED = 0x3;       // for
-    public static int GREEN = 0x4;     // move
-    public static int BLUE = 0x5;      // left
-    public static int YELLOW = 0x6;    //right
-    public static int PINK = 0x7;      // if
-    public static int LIGHTBLUE = 0x8; // else
-    public static int GREY = 0x9;      // beads
 
+    public static enum ourColors{
+        Black,
+        White,
+        Gray,
+        Yellow,
+        Green,
+        Cyan,
+        Blue,
+        Magenta,
+        Red,
+        Empty
+    }
     /*
      * set every time, specific to each capture
      */
@@ -35,12 +37,9 @@ public class ImageProcessing {
      *  Return array of commands from input image
      *  Assume fullscreen, resinfg could be done later
      */
-    public static int[] run(BufferedImage image) {
-        BufferedImage[] tiles = splitImage(image);
-        int[] commands = new int[tiles.length];
-        for(int i = 0; i < tiles.length; i++) {
-            commands[i] = getCommand(tiles[i]);
-        }
+    public static int[] run(Bitmap image) {
+        int[] commands = new int[TILES_COL * TILES_ROW];
+        splitImage(image, commands);
         return commands;
     }
 
@@ -48,37 +47,28 @@ public class ImageProcessing {
      * Splits image into tiles
      * tiles are TILES_ROW * TILES_COL in total
      */
-    private static BufferedImage[] splitImage(BufferedImage image) {
+    private static void splitImage(Bitmap image, int[] commands) {
         // set every time
         imageWidth = image.getWidth();
         imageHeight = image.getHeight();
         tileWidth = imageWidth / TILES_COL;
         tileHeight = imageHeight / TILES_ROW;
 
-        BufferedImage[] tiles = new BufferedImage[TILES_ROW * TILES_COL];
         //break image into tiles
         for(int i = 0; i < TILES_ROW; i++) {
             for(int j = 0; j < TILES_COL; j++) {
-                //reserve memory
-                tiles[i * TILES_COL + j] =
-                    new BufferedImage(tileWidth, tileHeight, image.getType());
-                //draw tiles
-                Graphics2D renderer = tiles[i * TILES_COL + j].createGraphics();
-                renderer.drawImage(image, 0, 0, tileWidth, tileHeight,
-                        tileWidth * j, tileHeight * i,
-                        tileWidth * j + tileWidth, tileHeight * i + tileHeight, null);
-                renderer.dispose();
+                commands[i * TILES_COL + j] =
+                        getCommand(image,tileWidth * j, tileHeight * i,
+                        tileWidth * j + tileWidth, tileHeight * i + tileHeight);
             }
         }
-        test(tiles);
-        return tiles;
     }
 
     /*
      * Returns command number corresponding to input image tile
      */
-    private static int getCommand(BufferedImage tile) {
-        if(tile == null) {
+    private static int getCommand(Bitmap image, int fromx, int fromy, int tox, int toy) {
+        if(image == null) {
             System.out.println("Input image is null");
         }
         int[] frequency = new int[NUM_COLORS];
@@ -87,17 +77,19 @@ public class ImageProcessing {
         int maxFrequency = 0;
         for(int x = 0; x < tileWidth; x++) {
             for(int y = 0; y < tileHeight; y++) {
-                color = tile.getRGB(x, y);
-                color = getSimpleColor(color);
-                frequency[color]++;
-                if(frequency[color] > maxFrequency) {
-                    mostFrequent = color;
-                    maxFrequency = frequency[color];
+                color = image.getPixel(x, y);
+                ourColors classifyResult = classify(color);
+                //System.out.println(tile.hashCode()+""+classifyResult);
+                int colorReturned = (int) classifyResult.ordinal();
+                frequency[colorReturned]++;
+                if(frequency[colorReturned] > maxFrequency) {
+                    mostFrequent = colorReturned;
+                    maxFrequency = frequency[colorReturned];
                 } 
             }
         }
-        if(mostFrequent == WHITE || mostFrequent == GREY) {
-            return countBeads(tile);
+        if(mostFrequent == ourColors.White.ordinal() || mostFrequent == ourColors.Gray.ordinal()) {
+            return countBeads(image);
         }
         return mostFrequent;
     }
@@ -106,7 +98,7 @@ public class ImageProcessing {
      * Counts beads in input image using
      * Hough Circle Trasform
      */ 
-    public static int countBeads(BufferedImage image) {
+    public static int countBeads(Bitmap image) {
         return 0;
     }
 
@@ -115,12 +107,37 @@ public class ImageProcessing {
      * Blue, Green, Red etc
      */
     private static int getSimpleColor(int hex) {
-        return 0;
-    } 
+        return classify(hex).ordinal();
+    }
+    
+    public static ourColors classify(int color)
+    {
+        float[] hsvvals = new float[3];
+
+        //Color.colorToHSV((color&0xFF0000)>>16, (color&0x00FF00)>>8, (color&0x0000FF)>>0, hsvvals);
+        Color.colorToHSV(color, hsvvals);
+
+        //System.out.println(((color&0xFF0000)>>16)+"-"+((color&0x00FF00)>>8)+"-"+(color&0x0000FF));
+        float hue = hsvvals[0]*360;
+        float sat = hsvvals[1];
+        float val = hsvvals[2];
+
+       // System.out.println(hue+"-"+lgt+"-"+sat);
+        if (sat < 0.25) return ourColors.Gray;
+        if (val < 0.1)  return ourColors.Black;
+        if (val > 0.9)  return ourColors.White;
+        if (hue < 30)   return ourColors.Red;
+        if (hue < 90)   return ourColors.Yellow;
+        if (hue < 150)  return ourColors.Green;
+        if (hue < 210)  return ourColors.Cyan;
+        if (hue < 270)  return ourColors.Blue;
+        if (hue < 330)  return ourColors.Magenta;
+        return ourColors.Red;
+    }
 
     /*
-     * Functions for testing purposes
-     */
+      Functions for testing purposes
+
     private static void test(BufferedImage[] tiles) {
         for(int i = 0; i < tiles.length; i++) {
             try {
@@ -132,12 +149,13 @@ public class ImageProcessing {
     }
 
     public static void main(String[] args) {
-        File input = new File("board.jpg");
+        File input = new File("sample.jpg");
         try {
             BufferedImage image = ImageIO.read(input);
             run(image);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Error reading input image");
         }
-    }
+    }*/
 }
