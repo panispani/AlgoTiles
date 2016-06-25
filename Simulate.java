@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class Simulate {
-
+    
     // Commands to numbers mappings
     public static final int MOVE = 1;
     public static final int LEFT = 2;
@@ -49,7 +49,7 @@ public class Simulate {
             switch(command) {
                 case MOVE:
                     if(!move(grid, player)) {
-                        //printErrorMessage();
+                        //printRetryMessage();
                         return;
                     }
                     break;
@@ -75,7 +75,7 @@ public class Simulate {
                     System.out.println("Wrong command id or end of program");
                     //return
             }
-            //draw();
+            //draw(); TODO: IMPORTANT
         }
     }
 
@@ -88,7 +88,7 @@ public class Simulate {
             Point player, ArrayList<Integer> commands, int index) {
         index++;
         int num = commands.get(index);
-        boolean condition = check_ahead(grid, player, num);
+        boolean condition = checkAhead(grid, player, num);
         int elsePos = findElse(commands, index);
         int endPos = findEnd(commands, index);
         if(elsePos < 0) {
@@ -111,21 +111,65 @@ public class Simulate {
     }
 
     /*
+     * Finds end in commands, returns its pos
+     */ 
+    private static int findEnd(ArrayList<Integer> commands, int index) {
+        for(int i = index; i < commands.size(); ++i) {
+            if (commands.get(i) == END) {
+                return i;
+            } 
+        } 
+        System.out.println("Error: End not found"); 
+        return 0;
+    }
+
+    /*
+     * Finds else in commands if any, returns its pos
+     * returns -1 if no else is found
+     */ 
+    private static int findElse(ArrayList<Integer> commands, int index) {
+         for(int i = index; i < commands.size(); ++i) {
+            if (commands.get(i) == ELSE) {
+                return i;
+            } else if(commands.get(i) == END) {
+                return -1;
+            } 
+        } 
+        return -1;   
+    }
+
+    /*
+     * Checks boolean condition of space being free "num" squares away
+     */ 
+    private static boolean checkAhead(int[][] grid, Point player, int num) {
+        return false; 
+    }
+
+    /*
      * Try to move player in his pointing direction
+     * in case of enemy ahead don't move player and set the LOST global variable
      * Return true upon success
      */
     private static boolean move(int[][] grid, Point player) {
+        //update both player and grid
+        boolean moved = false;
         switch(player.type) {
-                        case PLAYERUP:
-                            break;
-                    }
-
+            case PLAYERUP:
+                break;
+            case PLAYERLEFT:
+                break;
+            case PLAYERDOWN:
+                break;
+            case PLAYERRIGHT:
+                break;
+        }
+        return moved;
     }
 
    /*
      * Returns true in case of valid input commands
      */
-    public static boolean checkValidity(int[] commands) {
+    private static boolean checkValidity(int[] commands) {
         return false;
     }
 
