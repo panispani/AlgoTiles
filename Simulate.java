@@ -114,10 +114,17 @@ public class Simulate {
      * Finds end od index in commands, returns its pos
      */ 
     private static int findEnd(ArrayList<Integer> commands, int index) {
-        for(int i = index; i < commands.size(); ++i) {
+        int endsToFind = 1;
+        for(int i = index; i < commands.size(); i++) {
             if (commands.get(i) == END) {
-                return i;
+                endsToFind--;
+                if(endsToFind == 0) {
+                    return i;
+                }
+            } else if (commands.get(i) == IF || commands.get(i) == FOR) {
+                endsToFind++;
             } 
+
         } 
         System.out.println("Error: End not found"); 
         return 0;
@@ -128,12 +135,21 @@ public class Simulate {
      * returns -1 if no else is found
      */ 
     private static int findElse(ArrayList<Integer> commands, int index) {
-         for(int i = index; i < commands.size(); ++i) {
+        int elseToFind = 1;
+        for(int i = index; i < commands.size(); i++) {
             if (commands.get(i) == ELSE) {
-                return i;
+                elseToFind--;
+                if(elseToFind == 0) {
+                    return i;
+                }
             } else if(commands.get(i) == END) {
+                elseToFind--;
                 return -1;
-            } 
+            } else if(commands.get(i) == IF) {
+                elseToFind++;
+            } else if(commands.get(i) == FOR) {
+                i = findEnd(commands, i) + 1;
+            }
         } 
         return -1;   
     }
