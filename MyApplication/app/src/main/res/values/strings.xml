@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="title_activity_level_create">levelCreate</string>
 </resources>

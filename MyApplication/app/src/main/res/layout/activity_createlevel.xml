@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:id="@+id/rl">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save Level"
+        android:id="@+id/save"
+        android:onClick="SaveLevel"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/editText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SaveName:"
+        android:id="@+id/textView"
+        android:focusable="true"
+        android:layout_above="@+id/save"
+        android:layout_alignStart="@+id/save" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText"
+        android:layout_above="@+id/button2"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BACK"
+        android:id="@+id/button2"
+        android:onClick="Back"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/editText" />
+
+</RelativeLayout>

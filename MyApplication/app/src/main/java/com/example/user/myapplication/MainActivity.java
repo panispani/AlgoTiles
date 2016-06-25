@@ -3,33 +3,26 @@ package com.example.user.myapplication;
 import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.CountDownTimer;
+
 import android.os.Handler;
+
 import android.view.Display;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
 import android.widget.TextView;
 
 
-
-import java.lang.reflect.Array;
-import java.security.Timestamp;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
-import java.util.Calendar;
+
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity {
     private static final int CAMERA_REQUEST = 1888;
@@ -73,19 +66,15 @@ public class MainActivity extends Activity {
                         images[point0.x][point0.y].setImageBitmap(grass);
                         switch (dir){
                             case 0:
-
                                 images[point.x][point.y].setImageBitmap(player0);
                                 break;
                             case 1:
-
                                 images[point.x][point.y].setImageBitmap(player1);
                                 break;
                             case 2:
-
                                 images[point.x][point.y].setImageBitmap(player2);
                                 break;
                             case 3:
-
                                 images[point.x][point.y].setImageBitmap(player3);
                                 break;
                         }
@@ -100,22 +89,39 @@ public class MainActivity extends Activity {
     }
 
     int dir=0;
+    int[] ar;
+    int lastIndex=8;
+
     @Override
     protected void onStart(){
         super.onStart();
     }
     @Override
     protected void onResume(){
-        super.onResume();;
+        super.onResume();
+    }
 
+    private void setLastIndex() {
+        int index = ImageProcessing.TILES_ROW * ImageProcessing.TILES_COL - 1;
+        while(isNumber(ar[index - 1])) {
+            index--;
+        }
+        lastIndex = index;
+    }
+
+    private boolean isNumber(int id) {
+        return id >= NUMBER;
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
-            imageView.setImageBitmap(photo);
+
+            ar = ImageProcessing.run(photo);
+            setLastIndex();
         }
     }
+
     int width = 10;
     int height = 10;
     RelativeLayout r1;
@@ -125,6 +131,7 @@ public class MainActivity extends Activity {
     int rockC=2;
     int playerC =3;
     int flagC =4;
+
     int Array[][];
     Bitmap bomb;
     Bitmap grass;
@@ -237,8 +244,6 @@ public class MainActivity extends Activity {
                 }
 
                 if (Array [x][y] == flagC){
-
-
                     temp.setImageBitmap(flag);
                 }
 
@@ -253,10 +258,8 @@ public class MainActivity extends Activity {
                 r1.addView(temp);
             }
         }
-
-
-
     }
+
     public boolean isGrass(int y,int x){
         if(Array[y][x] == grassC){
             return true;
@@ -270,36 +273,42 @@ public class MainActivity extends Activity {
         }
         else
             return false;
+
     }
     public boolean isBomb(int height,int width){
         return Array[height][width] == bombC;
     }
+
     public boolean isFlag(int y,int x){
         return Array[y][x] == flagC;
     }
 
-    int ForC = 0;
-    int IfC =1;
-    int EndC=2;
-    int ElseC=3;
-    int RightC =4;
-    int LeftC =5;
-    int MoveC=6;
-    int NumC=7;
+
+    public static final int MOVE = 1;
+    public static final int LEFT = 2;
+    public static final int RIGHT = 3;
+    public static final int IF = 4;
+    public static final int FOR = 5;
+    public static final int ELSE = 6;
+    public static final int END = 7;
+    public static final int NUMBER = 8;
+
+
     void left(){
         dir--;
-        if(dir<0){
-            dir=3;
+        if(dir < 0){
+            dir = 3;
         }
     }
     void right(){
         dir++;
-        if(dir>3){
-            dir=0;
+        if(dir > 3){
+            dir = 0;
         }
     }
-    int[] ar = {MoveC,MoveC,RightC,ForC,3+NumC,MoveC,EndC,LeftC,MoveC,MoveC,LeftC,MoveC,MoveC};
-    int lastIndex=12;
+
+    //int[] ar = {MoveC,MoveC,RightC,ForC,3+NumC,MoveC,EndC,LeftC,MoveC,MoveC,LeftC,MoveC,MoveC};
+    //int lastIndex=12;
 
 
     int fun(int s){
@@ -308,46 +317,51 @@ public class MainActivity extends Activity {
             return -1;
         }
         if(s>lastIndex){
+
             return -1;
         }
-        if(ar[s]==EndC){
+        if(ar[s] == END){
             return s;
         }
 
-        else if(ar[s]==ForC){
-            int k=ar[s+1]-NumC;
+        else if(ar[s]==FOR){
+            int k=ar[s+1]-NUMBER;
             int e=s;
             for(int i=0;i<k;i++){
                 e = fun(s+2);
                 if(e==-1)
                     return -1;
+
             }
 
-            if(fun(e+1)==-1){
+            if(fun(e + 1) == -1){
                 return -1;
             }
 
         }
-        else if(ar[s]==IfC){
-            if(check(ar[s+1]-NumC)==0){
+
+        else if(ar[s]==IF){
+            if(check(ar[s+1]-NUMBER)==0){
                 int l=fun(s+2);
                 if (l==-1)
                     return -1;
                 return fun(l+1);
+
             }
             else{
-                while(ar[s]!=EndC&&ar[s]!=ElseC){
+                while(ar[s] != END && ar[s] != ELSE){
                     s++;
                 }
-                if(ar[s]==EndC){
+                if(ar[s] == END){
                     return s;
                 }
                 else{
-                    return(s+1);
+                    return(s + 1);
                 }
             }
         }
-        else if (ar[s]==MoveC){
+
+        else if (ar[s]==MOVE){
             int t = move();
             if(t==bombC){
                 loser();
@@ -362,21 +376,23 @@ public class MainActivity extends Activity {
                 winner();
                 return -1;
             }
+
         }
-        else if(ar[s]==LeftC){
+        else if(ar[s] == LEFT){
             left();
         }
-        else if(ar[s]==RightC){
+        else if(ar[s] == RIGHT){
             right();
         }
 
-        if(s<lastIndex&&s!=-1){
-            return fun(s+1);
+        if(s < lastIndex && s != -1){
+            return fun(s + 1);
         }
         else {
             return -1;
         }
     }
+
 
     private class MyPoint{
         int x,y,dir;
@@ -388,22 +404,19 @@ public class MainActivity extends Activity {
     }
     ArrayList<MyPoint> moves = new ArrayList<MyPoint>();
 
+
     public int check(int num){
         switch (dir){
             case 0:
                 return validMoveRight(1,num);
-
             case 1:
                 return validMoveDown(1,num);
-
             case 2:
-                return validMoveLeft(1,num);
-
+                return validMoveLeft(1, num);
             case 3:
-                return validMoveUp(1,num);
-
+                return validMoveUp(1, num);
         }
-      return 0;
+        return 0;
     }
     public int move(){
         int t = check(1);
@@ -427,16 +440,16 @@ public class MainActivity extends Activity {
         //images[playerY][playerX].setImageBitmap(grass);
         switch (dir){
             case 0:
-               playerX++;
+                playerX++;
                 break;
             case 1:
-               playerY++;
+                playerY++;
                 break;
             case 2:
                 playerX--;
                 break;
             case 3:
-             playerY--;
+                playerY--;
                 break;
         }
 
@@ -459,7 +472,7 @@ public class MainActivity extends Activity {
                 images[playerY][playerX].setImageBitmap(player2);
                 break;
             case 3:
-                images[playerY][playerX].setImageBitmap(player3);
+                images[playerY][playerX].setImageBitmap(player2);
                 break;
         }
         */
@@ -582,7 +595,7 @@ public class MainActivity extends Activity {
                 break;
             case 3:
                 playerY--;
-                //images[playerY][playerX].setImageBitmap(player3);
+                //images[playerY][playerX].setImageBitmap(player2);
                 break;
         }
         moves.add(new MyPoint(playerY,playerX,dir));
