@@ -9,8 +9,8 @@ public class ImageProcessing {
      * Tile information, global and specific to
      * the playboard
      */
-    public static int TILES_ROW = 10;
-    public static int TILES_COL = 5;
+    public static int TILES_ROW = 8;
+    public static int TILES_COL = 4;
     public static int NUM_COLORS = 17; // 7 + 10 numbers
 
     public static enum ourColors{
@@ -76,9 +76,11 @@ public class ImageProcessing {
         int color;
         int mostFrequent = ourColors.Empty.ordinal();
         int maxFrequency = 0;
-        for(int x = 0; x < tileWidth; x++) {
-            for(int y = 0; y < tileHeight; y++) {
-                color = image.getPixel(x, y);
+        int marginWidth = tileWidth / 4;
+        int marginHeight = tileHeight / 4;
+        for(int x = 0 + marginWidth; x < tileWidth - marginWidth; x++) {
+            for(int y = 0 + marginHeight; y < tileHeight - marginHeight; y++) {
+                color = image.getPixel(fromx + x, fromy + y);
                 ourColors classifyResult = classify(color);
                 //System.out.println(tile.hashCode()+""+classifyResult);
                 int colorReturned = (int) classifyResult.ordinal();
@@ -101,7 +103,7 @@ public class ImageProcessing {
      * Hough Circle Trasform
      */
     public static int countBeads(Bitmap image) {
-        return 2; //TODO: psalios
+        return 10; //TODO: psalios
         /*Mat mat = new Mat(image.getHeight(),image.getWidth(),CvType.CV_8U);
         byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
         mat.put(0, 0, pixels);
@@ -122,22 +124,21 @@ public class ImageProcessing {
         float[] hsbvals = new float[3];
 
         Color.colorToHSV(color, hsbvals);
-        float hue = hsbvals[0]*360;
+        float hue = hsbvals[0];
         float sat = hsbvals[1];
         float lgt = hsbvals[2];
 
-
         if (lgt < 0.15)  return ourColors.Black;
-        if (lgt > 0.7 && sat< 0.3) return ourColors.White;
+        if (lgt > 0.7 && sat < 0.3) return ourColors.White;
         if (sat < 0.25) return ourColors.Gray;
 
-        if (hue < 40)   return ourColors.Red;
-        if (hue < 90)   return ourColors.Yellow;
-        if (hue < 160)  return ourColors.Green;
-        if (hue < 210)  return ourColors.Cyan;
-        if (hue < 250)  return ourColors.Blue;
-        if (hue < 315)  return ourColors.Magenta;
-        return ourColors.Red;
+        if (hue < 25)   return ourColors.Red;
+        if (hue < 75)   return ourColors.Yellow;
+        if (hue < 141)  return ourColors.Green;
+        if (hue < 200)  return ourColors.Cyan;
+        if (hue < 250   )  return ourColors.Blue;
+        if (hue < 320)  return ourColors.Magenta;
+        else return ourColors.Red;
     }
 
     /*

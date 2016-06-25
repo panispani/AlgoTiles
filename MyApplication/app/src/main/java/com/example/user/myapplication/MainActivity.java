@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
                         MyPoint point = moves.get(1);
 
                         images[point0.x][point0.y].setImageBitmap(grass);
-                        switch (dir){
+                        switch (point.dir){
                             case 0:
                                 images[point.x][point.y].setImageBitmap(player0);
                                 break;
@@ -177,7 +177,7 @@ public class MainActivity extends Activity {
         Display d = getWindowManager().getDefaultDisplay();
 
 
-        int size = d.getWidth();
+        int size = d.getWidth()/2;
 
         bomb = BitmapFactory.decodeResource(this.getResources(),R.drawable.bomb);
         bomb = Bitmap.createScaledBitmap(bomb,size/height,size/width,false);
@@ -295,6 +295,7 @@ public class MainActivity extends Activity {
 
 
     void left(){
+
         dir--;
         if(dir < 0){
             dir = 3;
@@ -380,9 +381,11 @@ public class MainActivity extends Activity {
         }
         else if(ar[s] == LEFT){
             left();
+            moves.add(new MyPoint(playerY,playerX,dir));
         }
         else if(ar[s] == RIGHT){
             right();
+            moves.add(new MyPoint(playerY,playerX,dir));
         }
 
         if(s < lastIndex && s != -1){
