@@ -142,6 +142,24 @@ public class Simulate {
      * Checks boolean condition of space being free "num" squares away
      */ 
     private static boolean checkAhead(int[][] grid, Point player, int num) {
+        switch(player.type) {
+            case PLAYERUP:
+                return player.y - num >= 0 
+                    && grid[player.x][player.y - num] == GRASS;
+                break;
+            case PLAYERLEFT:
+                return player.x - num >= 0
+                    && grid[player.x - num][player.y] == GRASS;
+                break;
+            case PLAYERDOWN:
+                return player.y + num < grid.length 
+                    && grid[player.x][player.y + num] == GRASS;
+                break;
+            case PLAYERRIGHT:
+                return player.x + num < grid[0].length
+                    && grid[player.x + num][player.y] == GRASS;
+                break;
+        }
         return false; 
     }
 
@@ -155,18 +173,44 @@ public class Simulate {
         boolean moved = false;
         switch(player.type) {
             case PLAYERUP:
+                if(player.y - 1 >= 0 
+                    && grid[player.x][player.y - 1] == GRASS) {
+                        moved = true;
+                        grid[player.x][player.y - 1] = PLAYERUP;
+                        grid[player.x][player.y] = GRASS;
+                        player.y--;
+                    }
                 break;
             case PLAYERLEFT:
+                if(player.x - 1 >= 0
+                    && grid[player.x - 1][player.y] == GRASS) {
+                        moved = true;
+                        grid[player.x - 1][player.y] = PLAYERLEFT;
+                        grid[player.x][player.y] = GRASS;
+                        player.x--;
+                    }
                 break;
             case PLAYERDOWN:
+                if(player.y + 1 < grid.length 
+                    && grid[player.x][player.y + 1] == GRASS) {
+                        moved = true;
+                        grid[player.x][player.y + 1] = PLAYERDOWN;
+                        grid[player.x][player.y] = GRASS;
+                        player.y++;
+                    }
                 break;
             case PLAYERRIGHT:
+                if(player.x + 1 < grid[0].length
+                    && grid[player.x + 1][player.y] == GRASS) {
+                        moved = true;
+                        grid[player.x + 1][player.y] = PLAYERRIGHT;
+                        grid[player.x][player.y] = GRASS;
+                        player.x++;
+                    }
                 break;
         }
-        return moved;
-    }
-
-   /*
+    
+    /*
      * Returns true in case of valid input commands
      */
     private static boolean checkValidity(int[] commands) {
