@@ -66,10 +66,23 @@ public class MainActivity extends Activity {
 
     }
 
+    private void setLastIndex() {
+        int index = TILE_ROW * TILE_COL - 1;
+        while(isNumber(ar[index - 1])) {
+            index--;
+        }
+        lastindex = index;
+    }
+
+    private boolean isNumber(int id) {
+        
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
-            imageView.setImageBitmap(photo);
+            ar = run(photo);
+            setLastIndex();
         }
     }
     int width = 10;
@@ -81,6 +94,7 @@ public class MainActivity extends Activity {
     int rockC=2;
     int playerC =3;
     int flagC =4;
+
     int Array[][];
     Bitmap bomb;
     Bitmap grass;
@@ -116,7 +130,7 @@ public class MainActivity extends Activity {
         bomb = BitmapFactory.decodeResource(this.getResources(),R.drawable.bomb);
         bomb = Bitmap.createScaledBitmap(bomb,size/height,size/width,false);
 
-        grass = BitmapFactory.decodeResource(this.getResources(),R.drawable.grass);
+       grass = BitmapFactory.decodeResource(this.getResources(),R.drawable.grass);
         grass = Bitmap.createScaledBitmap(grass,size/height,size/width,false);
 
         rock = BitmapFactory.decodeResource(this.getResources(),R.drawable.rock);
@@ -197,9 +211,6 @@ public class MainActivity extends Activity {
                 r1.addView(temp);
             }
         }
-
-
-
     }
 
 
@@ -224,15 +235,15 @@ public class MainActivity extends Activity {
         return Array[height][width] == bombC;
     }
 
+    public static final int MOVE = 1;
+    public static final int LEFT = 2;
+    public static final int RIGHT = 3;
+    public static final int IF = 4;
+    public static final int FOR = 5;
+    public static final int ELSE = 6;
+    public static final int END = 7;
+    public static final int NUMBER = 8;
 
-    int ForC = 0;
-    int IfC =1;
-    int EndC=2;
-    int ElseC=3;
-    int RightC =4;
-    int LeftC =5;
-    int MoveC=6;
-    int NumC=7;
     void left(){
         dir--;
         if(dir<0){
@@ -245,80 +256,77 @@ public class MainActivity extends Activity {
             dir=0;
         }
     }
-    int[] ar = {ForC,5+NumC,MoveC,EndC,RightC,ForC,5+NumC,MoveC,EndC};
+    int[] ar;
     int lastIndex=8;
 
     int fun(int s){
 
-        if(s>lastIndex){
+        if(s > lastIndex){
             return -1;
         }
-        if(ar[s]==EndC){
+        if(ar[s] == END){
             return s;
         }
 
-        else if(ar[s]==ForC){
-            int k=ar[s+1]-NumC;
-            int e=s;
-            for(int i=0;i<k;i++){
+        else if(ar[s] == FOR){
+            int k = ar[s+1 ]-NUMBER;
+            int e = s;
+            for(int i = 0; i < k; i++){
                 e = fun (s+2);
             }
 
-            if(fun(e+1)==-1){
+            if(fun(e+1) == -1){
                 return -1;
             }
 
         }
-        else if(ar[s]==IfC){
-            if(check(ar[s+1]-NumC)==0){
-                int l=fun(s+2);
+        else if(ar[s] == IF){
+            if(check(ar[s+1] - NUM) == 0){
+                int l = fun(s+2);
                 return fun(l+1);
             }
             else{
-                while(ar[s]!=EndC&&ar[s]!=ElseC){
+                while(ar[s] != END && ar[s] != ELSE){
                     s++;
                 }
-                if(ar[s]==EndC){
+                if(ar[s] == END){
                     return s;
                 }
                 else{
-                    return(s+1);
+                    return(s + 1);
                 }
             }
         }
-        else if (ar[s]==MoveC){
+        else if (ar[s] == MOVE){
             move();
         }
-        else if(ar[s]==LeftC){
+        else if(ar[s] == LEFT){
             left();
         }
-        else if(ar[s]==RightC){
+        else if(ar[s] == RIGHT){
             right();
         }
 
-        if(s<lastIndex&&s!=-1){
-            return fun(s+1);
+        if(s < lastIndex && s != -1){
+            return fun(s + 1);
         }
         else {
             return -1;
         }
     }
+
     public int check(int num){
         switch (dir){
             case 0:
                 return validMoveRight(1,num);
-
             case 1:
                 return validMoveDown(1,num);
-
             case 2:
                 return validMoveLeft(1,num);
-
             case 3:
                 return validMoveUp(1,num);
-
         }
-      return 0;
+        return 0;
     }
     public void move(){
         if(check(1)!=0){
