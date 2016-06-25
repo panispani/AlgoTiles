@@ -37,6 +37,7 @@ public class MainActivity extends Activity {
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         start();
+        //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         photoButton.setOnClickListener(new View.OnClickListener() {
 

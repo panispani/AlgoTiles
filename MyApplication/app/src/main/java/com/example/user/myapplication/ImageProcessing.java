@@ -1,5 +1,5 @@
 package com.example.user.myapplication;
-
+import android.graphics.Color;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
@@ -92,93 +92,51 @@ public class ImageProcessing {
         if(mostFrequent == ourColors.White.ordinal() || mostFrequent == ourColors.Gray.ordinal()) {
             return countBeads(image);
         }
-        System.out.println(mostFrequent);//mistake, map to command
+        System.out.println(mostFrequent);
         return mostFrequent;
     }
 
     /*
      * Counts beads in input image using
      * Hough Circle Trasform
-     */ 
+     */
     public static int countBeads(Bitmap image) {
-        return 0;
+        return 2; //TODO: psalios
+        /*Mat mat = new Mat(image.getHeight(),image.getWidth(),CvType.CV_8U);
+        byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        mat.put(0, 0, pixels);
+        Mat circles = new Mat();
+        int iCannyUpperThreshold = 10;
+        int iMinRadius = 20;
+        int iMaxRadius = 1000;
+        int iAccumulator = 200;
+        Imgproc.HoughCircles( mat, circles, Imgproc.CV_HOUGH_GRADIENT, 2.0, mat.rows() / 8, iCannyUpperThreshold, iAccumulator, iMinRadius, iMaxRadius);
+        return circles.cols();*/
     }
 
     /*
-     * Gets input hex color and returns category of it
-     * Blue, Green, Red etc
+     * Classifies a colour in a colour caategory
      */
-    private static int getSimpleColor(int hex) {
-        return classify(hex).ordinal();
-    }
-
-    public static void hexToHSL(int color, int[] c) {
-        int re = (color & 0xFF0000) >> 16;
-        int gr = (color & 0x00FF00) >> 8;
-        int bl = (color & 0x0000FF);
-
-        double r = re /255.0;
-        double g = gr /255.0;
-        double b = bl /255.0;
-        double v;
-        double m;
-        double vm;
-        double r2, g2, b2;
-
-        int h = 0; // default to black
-        int s = 0;
-        int l = 0;
-        v = Math.max(r,g);
-        v = Math.max(v,b);
-        m = Math.min(r,g);
-        m = Math.min(m,b);
-        l = (int)((m + v) / 2.0);
-        vm = v - m;
-        s = (int)vm;
-        s /= (l <= 0.5) ? (v + m ) : (2.0 - v - m) ;
-
-        r2 = (v - r) / vm;
-        g2 = (v - g) / vm;
-        b2 = (v - b) / vm;
-        if (r == v)
-        {
-            h = (int)(g == m ? 5.0 + b2 : 1.0 - g2);
-        }
-        else if (g == v)
-        {
-            h = (int)(b == m ? 1.0 + r2 : 3.0 - b2);
-        }
-        else
-        {
-            h = (int)(r == m ? 3.0 + g2 : 5.0 - r2);
-        }
-        h /= 6.0;
-        c[0] = h;
-        c[1] = s;
-        c[2] = l;
-    }
-
     public static ourColors classify(int color)
     {
-        //color = 0xFFFF00;
-        //System.out.println(((color&0xFF0000)>>16)+"-"+((color&0x00FF00)>>8)+"-"+(color&0x0000FF));
-        int[] c = new int [3];
-        hexToHSL(color, c);
-        float hue = c[0];
-        float sat = c[1];
-        float lgt = c[2];
+        float[] hsbvals = new float[3];
 
-        if (lgt < 0.2)  return ourColors.Black;
-        if (lgt > 0.8)  return ourColors.White;
+        Color.colorToHSV(color, hsbvals);
+        float hue = hsbvals[0]*360;
+        float sat = hsbvals[1];
+        float lgt = hsbvals[2];
 
+
+        if (lgt < 0.15)  return ourColors.Black;
+        if (lgt > 0.7 && sat< 0.3) return ourColors.White;
         if (sat < 0.25) return ourColors.Gray;
 
-        if (hue < 30)   return ourColors.Red;
+        if (hue < 40)   return ourColors.Red;
         if (hue < 90)   return ourColors.Yellow;
-        if (hue < 150)  return ourColors.Green;
+        if (hue < 160)  return ourColors.Green;
         if (hue < 210)  return ourColors.Cyan;
-        if (hue < 270)  return ourColors.Blue;
-        if (hue < 330)  return ourColors.Magenta;
+        if (hue < 250)  return ourColors.Blue;
+        if (hue < 315)  return ourColors.Magenta;
         return ourColors.Red;
     }
 
@@ -195,36 +153,6 @@ public class ImageProcessing {
         }
     }
 
-    public static Color hex2Rgb(String colorStr) {
-        return new Color(
-                Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
-                Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
-                Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
-    }
-    
-    public static ourColors classify(int color)
-    {
-        float[] hsbvals = new float[3];
-
-        Color.RGBtoHSB((color&0xFF0000)>>16, (color&0x00FF00)>>8, (color&0x0000FF)>>0, hsbvals);
-        //System.out.println(((color&0xFF0000)>>16)+"-"+((color&0x00FF00)>>8)+"-"+(color&0x0000FF));
-        float hue = hsbvals[0]*360;
-        float sat = hsbvals[1];
-        float lgt = hsbvals[2];     
-
-       // System.out.println(hue+"-"+lgt+"-"+sat);
-        if (sat < 0.25) return ourColors.Gray;
-        if (lgt < 0.1)  return ourColors.Black;
-        if (lgt > 0.9)  return ourColors.White;
-
-        if (hue < 30)   return ourColors.Red;
-        if (hue < 90)   return ourColors.Yellow;
-        if (hue < 150)  return ourColors.Green;
-        if (hue < 210)  return ourColors.Cyan;
-        if (hue < 270)  return ourColors.Blue;
-        if (hue < 330)  return ourColors.Magenta;
-        return ourColors.Red;
-    }
     public static void main(String[] args) {
         File input = new File("sample.jpg");
         try {
