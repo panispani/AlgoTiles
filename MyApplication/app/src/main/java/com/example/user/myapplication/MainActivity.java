@@ -18,7 +18,6 @@ import android.widget.RelativeLayout;
 
 import android.widget.TextView;
 
-
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 
