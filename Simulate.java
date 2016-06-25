@@ -68,19 +68,52 @@ public class Simulate {
                     grid[player.x][player.y] = player.type;
                     break;
                 case IF:
-                    //also remove number
-                    break;
-                case ELSE:
-                    break;
-                case END:
+                    //also remove number, else and end, dont remove the if itself
+                    resolveIfStatement(grid, player, commands, i);
                     break;
                 default:
-                    System.out.println("Wrong command id");
+                    System.out.println("Wrong command id or end of program");
+                    //return
             }
             //draw();
         }
     }
 
+    /*
+     * Removes if/else false branches. Only true branch is left
+     * and executed sequentially
+     * input index is the index of the if command
+     */
+    public static void resolveIfStatement(int[][] grid,
+            Point player, ArrayList<Integer> commands, int index) {
+        index++;
+        int num = commands.get(index);
+        boolean condition = check_ahead(grid, player, num);
+        int elsePos = findElse(commands, index);
+        int endPos = findEnd(commands, index);
+        if(elsePos < 0) {
+            //if - end
+            if(condition) {
+                commands.remove(endPos);
+                commands.remove(index); //number
+            } else {
+                commands.removeRange(index, endPos + 1);
+            }
+        } else {
+            //if - else - end
+            if(condition) {
+                commands.removeRange(elsePos, endPos + 1);
+                commands.remove(index);
+            } else {
+                commands.removeRange(index, elsePos + 1);
+            }
+        }
+    }
+
+    /*
+     * Try to move player in his pointing direction
+     * Return true upon success
+     */
     private static boolean move(int[][] grid, Point player) {
         switch(player.type) {
                         case PLAYERUP:
