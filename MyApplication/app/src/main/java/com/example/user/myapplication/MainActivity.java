@@ -52,6 +52,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
+
             }
         });
         start.setOnClickListener(new View.OnClickListener() {
