@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.Display;
 import android.view.View;
@@ -17,12 +18,18 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import bsh.Interpreter;
+import android.widget.TextView;
+
+
 
 import java.lang.reflect.Array;
 import java.security.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity {
     private static final int CAMERA_REQUEST = 1888;
@@ -50,7 +57,43 @@ public class MainActivity extends Activity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                TextView t = (TextView) findViewById(R.id.textView);
+                t.setText("");
+                moves.add(new MyPoint(0,0,dir));
                 fun(0);
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable(){
+                    public void run(){
+                        MyPoint point0 = moves.get(0);
+                        MyPoint point = moves.get(1);
+
+                        images[point0.x][point0.y].setImageBitmap(grass);
+                        switch (dir){
+                            case 0:
+
+                                images[point.x][point.y].setImageBitmap(player0);
+                                break;
+                            case 1:
+
+                                images[point.x][point.y].setImageBitmap(player1);
+                                break;
+                            case 2:
+
+                                images[point.x][point.y].setImageBitmap(player2);
+                                break;
+                            case 3:
+
+                                images[point.x][point.y].setImageBitmap(player3);
+                                break;
+                        }
+
+                        moves.remove(0);
+                        if( moves.size()>1 )
+                            handler.postDelayed(this,500);
+                    }
+                },500);
             }
         });
     }
@@ -91,21 +134,36 @@ public class MainActivity extends Activity {
     Bitmap player3;
     Bitmap flag;
     ImageView[][] images;
+    int playerX = 0;
+    int playerY = 0;
 
     public void start(){
         // Array
+
         images=new ImageView[height][width];
         Array = new int[height][width];
+        int level[][] ={
+                {1,1,1,2,2,1,1,0,1,1},
+        {0,0,1,2,4,1,1,1,1,1},
+        {2,2,1,2,1,2,2,1,0,1},
+        {2,2,1,1,1,0,1,2,2,1},
+        {1,0,2,0,1,2,1,2,2,1},
+        {1,0,0,2,1,1,1,0,2,1},
+        {2,2,2,0,0,0,2,2,2,1},
+        {1,2,2,2,2,2,2,2,2,1},
+        {1,1,1,0,0,1,1,1,1,1},
+        {1,0,1,1,1,1,2,0,0,0}};
         Random r = new Random();
         for (int x=0; x < height; x++){
             for (int y = 0; y < width; y++){
 
-                int i1 = (r.nextInt(3));
-                Array [x][y] = i1;
-            };
-        };
-        Array[0][0]=playerC;
-        Array[height-1][width-1]=flagC;
+
+                Array [x][y] = level[x][y];
+                //Array [x][y]= bombC;
+            }
+        }
+         Array[playerY][playerX]=playerC;
+        //Array[height-1][width-1]=flagC;
         r1 = (RelativeLayout) findViewById(R.id.rl);
         r1.setBackground( getResources().getDrawable(R.drawable.grass));
         Display d = getWindowManager().getDefaultDisplay();
@@ -139,15 +197,12 @@ public class MainActivity extends Activity {
         flag = Bitmap.createScaledBitmap(flag,size/height,size/width,false);
 
 
-
-
-
         for (int x=0; x < height; x++){
             for (int y = 0; y < width; y++){
                 temp = new ImageView(this);
 
-                temp.setX(x*size/(float)height);
-                temp.setY(y*size/(float)width);
+                temp.setX(y*size/(float)height);
+                temp.setY(x*size/(float)width);
 
                 if (Array [x][y] == bombC){
 
@@ -201,20 +256,15 @@ public class MainActivity extends Activity {
 
 
     }
-
-
-    int playerX = 0;
-    int playerY = 0;
-
-    public boolean isGrass(int height,int width){
-        if(Array[height][width] == grassC){
+    public boolean isGrass(int y,int x){
+        if(Array[y][x] == grassC){
             return true;
         }
         else
             return false;
     }
     public boolean isRock(int height,int width){
-        if(Array[height][width] == rockC){
+        if(Array[width][height] == rockC){
             return true;
         }
         else
@@ -223,7 +273,9 @@ public class MainActivity extends Activity {
     public boolean isBomb(int height,int width){
         return Array[height][width] == bombC;
     }
-
+    public boolean isFlag(int y,int x){
+        return Array[y][x] == flagC;
+    }
 
     int ForC = 0;
     int IfC =1;
@@ -245,11 +297,15 @@ public class MainActivity extends Activity {
             dir=0;
         }
     }
-    int[] ar = {ForC,5+NumC,MoveC,EndC,RightC,ForC,5+NumC,MoveC,EndC};
-    int lastIndex=8;
+    int[] ar = {MoveC,MoveC,RightC,ForC,3+NumC,MoveC,EndC,LeftC,MoveC,MoveC,LeftC,MoveC,MoveC};
+    int lastIndex=12;
+
 
     int fun(int s){
 
+        if(s==-1){
+            return -1;
+        }
         if(s>lastIndex){
             return -1;
         }
@@ -261,7 +317,9 @@ public class MainActivity extends Activity {
             int k=ar[s+1]-NumC;
             int e=s;
             for(int i=0;i<k;i++){
-                e = fun (s+2);
+                e = fun(s+2);
+                if(e==-1)
+                    return -1;
             }
 
             if(fun(e+1)==-1){
@@ -272,6 +330,8 @@ public class MainActivity extends Activity {
         else if(ar[s]==IfC){
             if(check(ar[s+1]-NumC)==0){
                 int l=fun(s+2);
+                if (l==-1)
+                    return -1;
                 return fun(l+1);
             }
             else{
@@ -287,7 +347,20 @@ public class MainActivity extends Activity {
             }
         }
         else if (ar[s]==MoveC){
-            move();
+            int t = move();
+            if(t==bombC){
+                loser();
+                return -1;
+            }
+
+            if(t==rockC){
+                return -1;
+            }
+
+            if(t==flagC){
+                winner();
+                return -1;
+            }
         }
         else if(ar[s]==LeftC){
             left();
@@ -303,6 +376,17 @@ public class MainActivity extends Activity {
             return -1;
         }
     }
+
+    private class MyPoint{
+        int x,y,dir;
+        public MyPoint(int x,int y,int dir){
+            this.x = x;
+            this.y = y;
+            this.dir = dir;
+        }
+    }
+    ArrayList<MyPoint> moves = new ArrayList<MyPoint>();
+
     public int check(int num){
         switch (dir){
             case 0:
@@ -320,12 +404,26 @@ public class MainActivity extends Activity {
         }
       return 0;
     }
-    public void move(){
-        if(check(1)!=0){
-            return;
+    public int move(){
+        int t = check(1);
+        if(t==flagC){
+            updateCrush();
+            return flagC;
         }
+        if(t==bombC){
+
+            updateCrush();
+            return bombC;
+        }
+        if(t==rockC){
+            return rockC;
+        }
+        if(t==flagC){
+            return flagC;
+        }
+
         Array[playerY][playerX]=grassC;
-        images[playerX][playerY].setImageBitmap(grass);
+        //images[playerY][playerX].setImageBitmap(grass);
         switch (dir){
             case 0:
                playerX++;
@@ -342,25 +440,28 @@ public class MainActivity extends Activity {
         }
 
         updateGame();
-
+        return grassC;
     }
 
     public void updateGame(){
+        moves.add(new MyPoint(playerY,playerX,dir));
         Array[playerY][playerX]=playerC;
+        /*
         switch (dir){
             case 0:
-                images[playerX][playerY].setImageBitmap(player0);
+                images[playerY][playerX].setImageBitmap(player0);
                 break;
             case 1:
-                images[playerX][playerY].setImageBitmap(player1);
+                images[playerY][playerX].setImageBitmap(player1);
                 break;
             case 2:
-                images[playerX][playerY].setImageBitmap(player2);
+                images[playerY][playerX].setImageBitmap(player2);
                 break;
             case 3:
-                images[playerX][playerY].setImageBitmap(player3);
+                images[playerY][playerX].setImageBitmap(player3);
                 break;
         }
+        */
 
     }
 
@@ -369,16 +470,19 @@ public class MainActivity extends Activity {
             return 3;
         }
         if(isGrass(playerY, playerX + z)){
-            if (z==move){return 0;}
+            if (z==move){return grassC;}
             else
                 z++;
             return validMoveRight(z, move);
         }
         if (isRock(playerY, playerX+z)){
-            return 1;
+            return rockC;
         }
         if (isBomb(playerY, playerX+z)){
-            return 2;
+            return bombC;
+        }
+        if (isFlag(playerY, playerX+z)){
+            return flagC;
         }
         return -1;
 
@@ -388,16 +492,19 @@ public class MainActivity extends Activity {
             return 3;
         }
         if(isGrass(playerY, playerX - z)){
-            if (z==move){return 0;}
+            if (z==move){return grassC;}
             else
-                z--;
+                z++;
             return validMoveLeft(z, move);
         }
-        if (isRock(playerY, playerX- z)){
-           return 1;
+        if (isRock(playerY, playerX - z)){
+           return rockC;
         }
-        if (isBomb(playerY, playerX- z)){
-            return 2;
+        if (isBomb(playerY, playerX - z)){
+            return bombC;
+        }
+        if (isFlag(playerY, playerX - z)){
+            return flagC;
         }
         return -1;
 
@@ -406,17 +513,21 @@ public class MainActivity extends Activity {
         if(playerY-z<0){
             return 3;
         }
-        if(isGrass(playerY - z, playerX)){
-            if (z==move){return 0;}
+        if(isGrass(playerY -z,playerX )){
+            if (z==move){return grassC;}
             else
-                z--;
+                z++;
             return validMoveUp(z, move);
         }
         if (isRock(playerY- z, playerX)){
-            return 1;
+            return rockC;
         }
-        if (isBomb(playerY- z, playerX)){
-            return 2;
+        if (isBomb(playerY-z, playerX)){
+            return bombC;
+        }
+
+        if (isFlag(playerY-z, playerX)){
+            return flagC;
         }
         return -1;
 
@@ -426,18 +537,55 @@ public class MainActivity extends Activity {
             return 3;
         }
         if(isGrass(playerY + z, playerX)){
-            if (z==move){return 0;}
+            if (z==move){return grassC;}
             else
                 z++;
-            return validMoveUp(z, move);
+            return validMoveDown(z, move);
         }
         if (isRock(playerY+ z, playerX)){
-            return 1;
+            return rockC;
         }
         if (isBomb(playerY+ z, playerX)){
-            return 2;
+            return bombC;
+        }
+        if (isFlag(playerY+ z, playerX)){
+            return flagC;
         }
         return -1;
 
     }
+    public void loser(){
+        TextView t = (TextView) findViewById(R.id.textView);
+        t.setText("Loser");
+    }
+    public void winner(){
+        TextView t = (TextView) findViewById(R.id.textView);
+        t.setText("Winner");
+    }
+
+    public void updateCrush(){
+        Array[playerY][playerX]=grassC;
+        //images[playerY][playerX].setImageBitmap(grass);
+        switch (dir){
+            case 0:
+                playerX++;
+                //images[playerY][playerX].setImageBitmap(player0);
+                break;
+            case 1:
+                playerY++;
+                //images[playerY][playerX].setImageBitmap(player1);
+                break;
+            case 2:
+                playerX--;
+                //images[playerY][playerX].setImageBitmap(player2);
+                break;
+            case 3:
+                playerY--;
+                //images[playerY][playerX].setImageBitmap(player3);
+                break;
+        }
+        moves.add(new MyPoint(playerY,playerX,dir));
+    }
+
+
 }
