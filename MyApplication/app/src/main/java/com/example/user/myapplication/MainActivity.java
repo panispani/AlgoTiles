@@ -3,25 +3,16 @@ package com.example.user.myapplication;
 import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Handler;
 import android.view.Display;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import bsh.Interpreter;
 
-import java.lang.reflect.Array;
-import java.security.Timestamp;
-import java.util.Calendar;
 import java.util.Random;
 
 public class MainActivity extends Activity {
@@ -56,32 +47,34 @@ public class MainActivity extends Activity {
     }
 
     int dir=0;
+    int[] ar;
+    int lastIndex=8;
+
     @Override
     protected void onStart(){
         super.onStart();
     }
     @Override
     protected void onResume(){
-        super.onResume();;
-
+        super.onResume();
     }
 
     private void setLastIndex() {
-        int index = TILE_ROW * TILE_COL - 1;
+        int index = ImageProcessing.TILES_ROW * ImageProcessing.TILES_COL - 1;
         while(isNumber(ar[index - 1])) {
             index--;
         }
-        lastindex = index;
+        lastIndex = index;
     }
 
     private boolean isNumber(int id) {
-        
+        return id >= NUMBER;
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
-            ar = run(photo);
+            ar = ImageProcessing.run(photo);
             setLastIndex();
         }
     }
@@ -218,18 +211,10 @@ public class MainActivity extends Activity {
     int playerY = 0;
 
     public boolean isGrass(int height,int width){
-        if(Array[height][width] == grassC){
-            return true;
-        }
-        else
-            return false;
+        return (Array[height][width] == grassC);
     }
     public boolean isRock(int height,int width){
-        if(Array[height][width] == rockC){
-            return true;
-        }
-        else
-            return false;
+        return (Array[height][width] == rockC);
     }
     public boolean isBomb(int height,int width){
         return Array[height][width] == bombC;
@@ -256,8 +241,6 @@ public class MainActivity extends Activity {
             dir=0;
         }
     }
-    int[] ar;
-    int lastIndex=8;
 
     int fun(int s){
 
@@ -269,21 +252,21 @@ public class MainActivity extends Activity {
         }
 
         else if(ar[s] == FOR){
-            int k = ar[s+1 ]-NUMBER;
+            int k = ar[s+1 ] - NUMBER;
             int e = s;
             for(int i = 0; i < k; i++){
-                e = fun (s+2);
+                e = fun(s + 2);
             }
 
-            if(fun(e+1) == -1){
+            if(fun(e + 1) == -1){
                 return -1;
             }
 
         }
         else if(ar[s] == IF){
-            if(check(ar[s+1] - NUM) == 0){
-                int l = fun(s+2);
-                return fun(l+1);
+            if(check(ar[s + 1] - NUMBER) == 0){
+                int l = fun(s + 2);
+                return fun(l + 1);
             }
             else{
                 while(ar[s] != END && ar[s] != ELSE){
@@ -322,9 +305,9 @@ public class MainActivity extends Activity {
             case 1:
                 return validMoveDown(1,num);
             case 2:
-                return validMoveLeft(1,num);
+                return validMoveLeft(1, num);
             case 3:
-                return validMoveUp(1,num);
+                return validMoveUp(1, num);
         }
         return 0;
     }
