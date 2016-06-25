@@ -2,8 +2,6 @@ package com.example.user.myapplication;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import java.io.*;
-import java.util.*;
 
 public class ImageProcessing {
 
@@ -62,12 +60,6 @@ public class ImageProcessing {
                 commands[i * TILES_COL + j] =
                         getCommand(image,tileWidth * j, tileHeight * i,
                         tileWidth * j + tileWidth, tileHeight * i + tileHeight);
-                /*draw tiles for testing
-                Graphics2D renderer = tiles[i * TILES_COL + j].createGraphics();
-                renderer.drawImage(image, 0, 0, tileWidth, tileHeight,
-                        tileWidth * j, tileHeight * i,
-                        tileWidth * j + tileWidth, tileHeight * i + tileHeight, null);
-                renderer.dispose();*/
             }
         }
     }
@@ -115,34 +107,25 @@ public class ImageProcessing {
      * Blue, Green, Red etc
      */
     private static int getSimpleColor(int hex) {
-        return 0;
-        //return classify(hex2Rgb(new String(hex))).ordinal();
-    } 
-
-
-
-    public static Color hex2Rgb(String colorStr) {
-        return new Color(
-                Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
-                Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
-                Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
+        return classify(hex).ordinal();
     }
     
     public static ourColors classify(int color)
     {
-        float[] hsbvals = new float[3];
+        float[] hsvvals = new float[3];
 
-        Color.RGBtoHSB((color&0xFF0000)>>16, (color&0x00FF00)>>8, (color&0x0000FF)>>0, hsbvals);
+        //Color.colorToHSV((color&0xFF0000)>>16, (color&0x00FF00)>>8, (color&0x0000FF)>>0, hsvvals);
+        Color.colorToHSV(color, hsvvals);
+
         //System.out.println(((color&0xFF0000)>>16)+"-"+((color&0x00FF00)>>8)+"-"+(color&0x0000FF));
-        float hue = hsbvals[0]*360;
-        float sat = hsbvals[1];
-        float lgt = hsbvals[2];     
+        float hue = hsvvals[0]*360;
+        float sat = hsvvals[1];
+        float val = hsvvals[2];
 
        // System.out.println(hue+"-"+lgt+"-"+sat);
         if (sat < 0.25) return ourColors.Gray;
-        if (lgt < 0.1)  return ourColors.Black;
-        if (lgt > 0.9)  return ourColors.White;
-
+        if (val < 0.1)  return ourColors.Black;
+        if (val > 0.9)  return ourColors.White;
         if (hue < 30)   return ourColors.Red;
         if (hue < 90)   return ourColors.Yellow;
         if (hue < 150)  return ourColors.Green;
