@@ -29,4 +29,27 @@ public class Simulate {
             //draw();
         }
     }
+
+    private static ArrayList<Integer> removeLoops(int[] init_commands) {
+        return null; 
+    }
+    
+    /*
+     * Finds position of player in grid
+     * Assumes only one player is around
+     */
+    private static Point findPlayer(int[][] grid) {
+        Point player;
+        for(int i = 0; i < grid.length; i++) {
+            for(int j = 0; j < grid[i].length; j++) {
+                if(grid[i][j] == PLAYER) {
+                    player.x = i;
+                    player.y = j;
+                    return;
+                }
+            }
+        } 
+        System.out.println("Error in finding player");
+        return player;
+    }
 }
