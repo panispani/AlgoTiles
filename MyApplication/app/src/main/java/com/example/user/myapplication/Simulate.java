@@ -23,6 +23,9 @@ public class Simulate {
     public static final int PLAYERDOWN = 7;
     public static final int PLAYERRIGHT = 8;
 
+    private static boolean WIN = false;
+    private static boolean LOST = false;
+
     // used to store player position
     private static class Point {
         int x;
@@ -37,6 +40,16 @@ public class Simulate {
     }
 
     /*
+     * Dealy for some seconds
+     */
+    private static void delay() {
+        int j = 0;
+        for(int i = 0; i < 10000000; i++) {
+            j++;
+        }
+    }
+
+    /*
      * Simulates game with the given commands
      */
     public static void simulate(int[][] grid, int[] initial_commands) {
@@ -47,11 +60,16 @@ public class Simulate {
         ArrayList<Integer> commands = removeLoops(initial_commands);
         Point player = findPlayer(grid);
         for(int i = 0; i < commands.size(); i++) {
+            delay();
             int command = commands.get(i);
             switch(command) {
                 case MOVE:
                     if(!move(grid, player)) {
                         //printRetryMessage();
+                        return;
+                    }
+                    if(WIN) {
+                        //printWinMessage()
                         return;
                     }
                     break;
@@ -198,55 +216,63 @@ private static int findEnd(ArrayList<Integer> commands, int index) {
      */
     private static boolean move(int[][] grid, Point player) {
         //update both player and grid
-        boolean lost = false;
+        LOST = WIN = false;
         switch(player.type) {
             case PLAYERUP:
                 if(player.y - 1 >= 0
                     && grid[player.x][player.y - 1] == GRASS) {
-                        lost = true;
+                        LOST = true;
                         grid[player.x][player.y - 1] = PLAYERUP;
                         grid[player.x][player.y] = GRASS;
                         player.y--;
                 }
                 // not lose in case of rock
-                lost = player.y - 1 >= 0
-                            && grid[player.x][player.y - 1] == ROCK;
+                LOST = player.y - 1 >= 0
+                            && grid[player.x][player.y - 1] == BOMB;
+                WIN = player.y - 1 >= 0
+                        && grid[player.x][player.y - 1] == FLAG;
                 break;
             case PLAYERLEFT:
                 if(player.x - 1 >= 0
                     && grid[player.x - 1][player.y] == GRASS) {
-                        lost = true;
+                        LOST = true;
                         grid[player.x - 1][player.y] = PLAYERLEFT;
                         grid[player.x][player.y] = GRASS;
                         player.x--;
                 }
-                lost = player.x - 1 >= 0
-                            && grid[player.x - 1][player.y] == ROCK;
+                LOST = player.x - 1 >= 0
+                            && grid[player.x - 1][player.y] == BOMB;
+                WIN = player.x - 1 >= 0
+                    && grid[player.x - 1][player.y] == FLAG;
                 break;
             case PLAYERDOWN:
                 if(player.y + 1 < grid.length
                     && grid[player.x][player.y + 1] == GRASS) {
-                        lost = true;
+                        LOST = true;
                         grid[player.x][player.y + 1] = PLAYERDOWN;
                         grid[player.x][player.y] = GRASS;
                         player.y++;
                 }
-                lost = player.y + 1 < grid.length
-                            && grid[player.x][player.y + 1] == ROCK;
+                LOST = player.y + 1 < grid.length
+                            && grid[player.x][player.y + 1] == BOMB;
+                WIN = player.y + 1 < grid.length
+                        && grid[player.x][player.y + 1] == FLAG;
                 break;
             case PLAYERRIGHT:
                 if(player.x + 1 < grid[0].length
                     && grid[player.x + 1][player.y] == GRASS) {
-                        lost = true;
+                        LOST = true;
                         grid[player.x + 1][player.y] = PLAYERRIGHT;
                         grid[player.x][player.y] = GRASS;
                         player.x++;
                 }
-                lost = player.x + 1 < grid[0].length
-                            && grid[player.x + 1][player.y] == ROCK;
+                LOST = player.x + 1 < grid[0].length
+                            && grid[player.x + 1][player.y] == BOMB;
+                WIN = player.x + 1 < grid[0].length
+                        && grid[player.x + 1][player.y] == FLAG;
                 break;
         }
-        return lost;
+        return !LOST;
     }
 
     /*
