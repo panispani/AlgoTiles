@@ -78,6 +78,7 @@ public class MainActivity extends Activity {
             setLastIndex();
         }
     }
+
     int width = 10;
     int height = 10;
     RelativeLayout r1;
@@ -123,7 +124,7 @@ public class MainActivity extends Activity {
         bomb = BitmapFactory.decodeResource(this.getResources(),R.drawable.bomb);
         bomb = Bitmap.createScaledBitmap(bomb,size/height,size/width,false);
 
-       grass = BitmapFactory.decodeResource(this.getResources(),R.drawable.grass);
+        grass = BitmapFactory.decodeResource(this.getResources(),R.drawable.grass);
         grass = Bitmap.createScaledBitmap(grass,size/height,size/width,false);
 
         rock = BitmapFactory.decodeResource(this.getResources(),R.drawable.rock);
@@ -144,9 +145,6 @@ public class MainActivity extends Activity {
 
         flag = BitmapFactory.decodeResource(this.getResources(),R.drawable.flag);
         flag = Bitmap.createScaledBitmap(flag,size/height,size/width,false);
-
-
-
 
 
         for (int x=0; x < height; x++){
@@ -188,8 +186,6 @@ public class MainActivity extends Activity {
                 }
 
                 if (Array [x][y] == flagC){
-
-
                     temp.setImageBitmap(flag);
                 }
 
@@ -205,7 +201,6 @@ public class MainActivity extends Activity {
             }
         }
     }
-
 
     int playerX = 0;
     int playerY = 0;
@@ -231,14 +226,14 @@ public class MainActivity extends Activity {
 
     void left(){
         dir--;
-        if(dir<0){
-            dir=3;
+        if(dir < 0){
+            dir = 3;
         }
     }
     void right(){
         dir++;
-        if(dir>3){
-            dir=0;
+        if(dir > 3){
+            dir = 0;
         }
     }
 
@@ -252,7 +247,7 @@ public class MainActivity extends Activity {
         }
 
         else if(ar[s] == FOR){
-            int k = ar[s+1 ] - NUMBER;
+            int k = ar[s + 1] - NUMBER;
             int e = s;
             for(int i = 0; i < k; i++){
                 e = fun(s + 2);
@@ -319,16 +314,16 @@ public class MainActivity extends Activity {
         images[playerX][playerY].setImageBitmap(grass);
         switch (dir){
             case 0:
-               playerX++;
+                playerX++;
                 break;
             case 1:
-               playerY++;
+                playerY++;
                 break;
             case 2:
                 playerX--;
                 break;
             case 3:
-             playerY--;
+                playerY--;
                 break;
         }
 
