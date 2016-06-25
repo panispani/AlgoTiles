@@ -165,51 +165,62 @@ public class Simulate {
 
     /*
      * Try to move player in his pointing direction
-     * in case of enemy ahead don't move player and set the LOST global variable
+     * in case of enemy ahead don't move player
      * Return true upon success
      */
     private static boolean move(int[][] grid, Point player) {
         //update both player and grid
-        boolean moved = false;
+        boolean lost = false;
         switch(player.type) {
             case PLAYERUP:
                 if(player.y - 1 >= 0 
                     && grid[player.x][player.y - 1] == GRASS) {
-                        moved = true;
+                        lost = true;
                         grid[player.x][player.y - 1] = PLAYERUP;
                         grid[player.x][player.y] = GRASS;
                         player.y--;
-                    }
+                }
+                // not lose in case of rock
+                lost = player.y - 1 >= 0 
+                            && grid[player.x][player.y - 1] == ROCK;
                 break;
             case PLAYERLEFT:
                 if(player.x - 1 >= 0
                     && grid[player.x - 1][player.y] == GRASS) {
-                        moved = true;
+                        lost = true;
                         grid[player.x - 1][player.y] = PLAYERLEFT;
                         grid[player.x][player.y] = GRASS;
                         player.x--;
-                    }
+                }
+                lost = player.x - 1 >= 0 
+                            && grid[player.x - 1][player.y] == ROCK;
                 break;
             case PLAYERDOWN:
                 if(player.y + 1 < grid.length 
                     && grid[player.x][player.y + 1] == GRASS) {
-                        moved = true;
+                        lost = true;
                         grid[player.x][player.y + 1] = PLAYERDOWN;
                         grid[player.x][player.y] = GRASS;
                         player.y++;
-                    }
+                }
+                lost = player.y + 1 < grid.length 
+                            && grid[player.x][player.y + 1] == ROCK;
                 break;
             case PLAYERRIGHT:
                 if(player.x + 1 < grid[0].length
                     && grid[player.x + 1][player.y] == GRASS) {
-                        moved = true;
+                        lost = true;
                         grid[player.x + 1][player.y] = PLAYERRIGHT;
                         grid[player.x][player.y] = GRASS;
                         player.x++;
-                    }
+                }
+                lost = player.x + 1 < grid[0].length
+                            && grid[player.x + 1][player.y] == ROCK;
                 break;
         }
-    
+        return lost;
+    } 
+
     /*
      * Returns true in case of valid input commands
      */
