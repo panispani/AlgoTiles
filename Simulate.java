@@ -1,7 +1,7 @@
-import java.util.ArrayList;
+import java.util.*;
 
 public class Simulate {
-    
+
     // Commands to numbers mappings
     public static final int MOVE = 1;
     public static final int LEFT = 2;
@@ -43,7 +43,7 @@ public class Simulate {
             return;
         }
         ArrayList<Integer> commands = removeLoops(initial_commands);
-        Point playerPos = findPlayer(grid);
+        Point player = findPlayer(grid);
         for(int i = 0; i < commands.size(); i++) {
             int command = commands.get(i);
             switch(command) {
@@ -97,23 +97,23 @@ public class Simulate {
                 commands.remove(endPos);
                 commands.remove(index); //number
             } else {
-                commands.removeRange(index, endPos + 1);
+                commands.subList(index, endPos + 1).clear();
             }
         } else {
             //if - else - end
             if(condition) {
-                commands.removeRange(elsePos, endPos + 1);
+                commands.subList(elsePos, endPos + 1).clear();
                 commands.remove(index);
             } else {
-                commands.removeRange(index, elsePos + 1);
+                commands.subList(index, endPos + 1).clear();
             }
         }
     }
 
     /*
      * Finds end od index in commands, returns its pos
-     */ 
-    private static int findEnd(ArrayList<Integer> commands, int index) {
+     */
+private static int findEnd(ArrayList<Integer> commands, int index) {
         int endsToFind = 1;
         for(int i = index; i < commands.size(); i++) {
             if (commands.get(i) == END) {
@@ -123,17 +123,17 @@ public class Simulate {
                 }
             } else if (commands.get(i) == IF || commands.get(i) == FOR) {
                 endsToFind++;
-            } 
+            }
 
-        } 
-        System.out.println("Error: End not found"); 
+        }
+        System.out.println("Error: End not found");
         return 0;
     }
 
     /*
      * Finds else of index in commands if any, returns its pos
      * returns -1 if no else is found
-     */ 
+     */
     private static int findElse(ArrayList<Integer> commands, int index) {
         int elseToFind = 1;
         for(int i = index; i < commands.size(); i++) {
@@ -150,33 +150,29 @@ public class Simulate {
             } else if(commands.get(i) == FOR) {
                 i = findEnd(commands, i) + 1;
             }
-        } 
-        return -1;   
+        }
+        return -1;
     }
 
     /*
      * Checks boolean condition of space being free "num" squares away
-     */ 
+     */
     private static boolean checkAhead(int[][] grid, Point player, int num) {
         switch(player.type) {
             case PLAYERUP:
-                return player.y - num >= 0 
+                return player.y - num >= 0
                     && grid[player.x][player.y - num] == GRASS;
-                break;
             case PLAYERLEFT:
                 return player.x - num >= 0
                     && grid[player.x - num][player.y] == GRASS;
-                break;
             case PLAYERDOWN:
-                return player.y + num < grid.length 
+                return player.y + num < grid.length
                     && grid[player.x][player.y + num] == GRASS;
-                break;
             case PLAYERRIGHT:
                 return player.x + num < grid[0].length
                     && grid[player.x + num][player.y] == GRASS;
-                break;
         }
-        return false; 
+        return false;
     }
 
     /*
@@ -189,7 +185,7 @@ public class Simulate {
         boolean lost = false;
         switch(player.type) {
             case PLAYERUP:
-                if(player.y - 1 >= 0 
+                if(player.y - 1 >= 0
                     && grid[player.x][player.y - 1] == GRASS) {
                         lost = true;
                         grid[player.x][player.y - 1] = PLAYERUP;
@@ -197,7 +193,7 @@ public class Simulate {
                         player.y--;
                 }
                 // not lose in case of rock
-                lost = player.y - 1 >= 0 
+                lost = player.y - 1 >= 0
                             && grid[player.x][player.y - 1] == ROCK;
                 break;
             case PLAYERLEFT:
@@ -208,18 +204,18 @@ public class Simulate {
                         grid[player.x][player.y] = GRASS;
                         player.x--;
                 }
-                lost = player.x - 1 >= 0 
+                lost = player.x - 1 >= 0
                             && grid[player.x - 1][player.y] == ROCK;
                 break;
             case PLAYERDOWN:
-                if(player.y + 1 < grid.length 
+                if(player.y + 1 < grid.length
                     && grid[player.x][player.y + 1] == GRASS) {
                         lost = true;
                         grid[player.x][player.y + 1] = PLAYERDOWN;
                         grid[player.x][player.y] = GRASS;
                         player.y++;
                 }
-                lost = player.y + 1 < grid.length 
+                lost = player.y + 1 < grid.length
                             && grid[player.x][player.y + 1] == ROCK;
                 break;
             case PLAYERRIGHT:
@@ -235,7 +231,7 @@ public class Simulate {
                 break;
         }
         return lost;
-    } 
+    }
 
     /*
      * Returns true in case of valid input commands
@@ -250,15 +246,19 @@ public class Simulate {
      * Unfolds loops returns arraylist
      */
     private static ArrayList<Integer> removeLoops(int[] init_commands) {
+        ArrayList<Integer> init = new ArrayList<>();
+        for(int i = 0; i < init_commands.length; i++) {
+            init.add(init_commands[i]);
+        }
         ArrayList<Integer> commands = new ArrayList<>();
         for(int i = 0; i < init_commands.length; i++) {
             if(init_commands[i] != FOR) {
                 commands.add(init_commands[i]);
             } else {
-                int endPos = findEnd(new ArrayList(init_commands), index);        
+                int endPos = findEnd(init, i);
                 int times = init_commands[i + 1];
                 for(int j = 0; j < times; j++) {
-                    for(index = i + 2; index < endPos; index++) {
+                    for(int index = i + 2; index < endPos; index++) {
                         commands.add(init_commands[index]);
                     }
                 }
