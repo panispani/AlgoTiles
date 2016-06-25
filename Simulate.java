@@ -111,7 +111,7 @@ public class Simulate {
     }
 
     /*
-     * Finds end in commands, returns its pos
+     * Finds end od index in commands, returns its pos
      */ 
     private static int findEnd(ArrayList<Integer> commands, int index) {
         for(int i = index; i < commands.size(); ++i) {
@@ -124,7 +124,7 @@ public class Simulate {
     }
 
     /*
-     * Finds else in commands if any, returns its pos
+     * Finds else of index in commands if any, returns its pos
      * returns -1 if no else is found
      */ 
     private static int findElse(ArrayList<Integer> commands, int index) {
@@ -223,6 +223,7 @@ public class Simulate {
 
     /*
      * Returns true in case of valid input commands
+     * not alone number, after if, for there is a number, if for end with end else followed by end
      */
     private static boolean checkValidity(int[] commands) {
         return false;
@@ -233,7 +234,22 @@ public class Simulate {
      * Unfolds loops returns arraylist
      */
     private static ArrayList<Integer> removeLoops(int[] init_commands) {
-        return null;
+        ArrayList<Integer> commands = new ArrayList<>();
+        for(int i = 0; i < init_commands.length; i++) {
+            if(init_commands[i] != FOR) {
+                commands.add(init_commands[i]);
+            } else {
+                int endPos = findEnd(new ArrayList(init_commands), index);        
+                int times = init_commands[i + 1];
+                for(int j = 0; j < times; j++) {
+                    for(index = i + 2; index < endPos; index++) {
+                        commands.add(init_commands[index]);
+                    }
+                }
+                i = endPos;
+            }
+        }
+        return commands;
     }
 
     /*
