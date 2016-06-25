@@ -1,13 +1,9 @@
 package com.example.user.myapplication;
 
 import android.graphics.Bitmap;
-
-import java.awt.image.BufferedImage;
-
-import javax.imageio.ImageIO;
-
+import android.graphics.Color;
 import java.io.*;
-import java.awt.*;
+import java.util.*;
 
 public class ImageProcessing {
 
@@ -44,12 +40,8 @@ public class ImageProcessing {
      *  Assume fullscreen, resinfg could be done later
      */
     public static int[] run(Bitmap image) {
-        BufferedImage[] tiles = splitImage(image);
-        int[] commands = new ourColors[tiles.length];
-        for(int i = 0; i < tiles.length; i++) {
-            System.out.print(i+"\t");
-            commands[i] = getCommand(tiles[i]);
-        }
+        int[] commands = new int[TILES_COL * TILES_ROW];
+        splitImage(image, commands);
         return commands;
     }
 
@@ -57,60 +49,56 @@ public class ImageProcessing {
      * Splits image into tiles
      * tiles are TILES_ROW * TILES_COL in total
      */
-    private static BufferedImage[] splitImage(BufferedImage image) {
+    private static void splitImage(Bitmap image, int[] commands) {
         // set every time
         imageWidth = image.getWidth();
         imageHeight = image.getHeight();
         tileWidth = imageWidth / TILES_COL;
         tileHeight = imageHeight / TILES_ROW;
 
-        BufferedImage[] tiles = new BufferedImage[TILES_ROW * TILES_COL];
         //break image into tiles
         for(int i = 0; i < TILES_ROW; i++) {
             for(int j = 0; j < TILES_COL; j++) {
-                //reserve memory
-                tiles[i * TILES_COL + j] =
-                    new BufferedImage(tileWidth, tileHeight, image.getType());
-                //draw tiles
+                commands[i * TILES_COL + j] =
+                        getCommand(image,tileWidth * j, tileHeight * i,
+                        tileWidth * j + tileWidth, tileHeight * i + tileHeight);
+                /*draw tiles for testing
                 Graphics2D renderer = tiles[i * TILES_COL + j].createGraphics();
                 renderer.drawImage(image, 0, 0, tileWidth, tileHeight,
                         tileWidth * j, tileHeight * i,
                         tileWidth * j + tileWidth, tileHeight * i + tileHeight, null);
-                renderer.dispose();
+                renderer.dispose();*/
             }
         }
-        test(tiles);
-        return tiles;
     }
 
     /*
      * Returns command number corresponding to input image tile
      */
-    private static ourColors getCommand(BufferedImage tile) {
-        if(tile == null) {
+    private static int getCommand(Bitmap image, int fromx, int fromy, int tox, int toy) {
+        if(image == null) {
             System.out.println("Input image is null");
         }
         int[] frequency = new int[NUM_COLORS];
         int color;
-        ourColors mostFrequent = ourColors.Empty;
+        int mostFrequent = 0;
         int maxFrequency = 0;
         for(int x = 0; x < tileWidth; x++) {
             for(int y = 0; y < tileHeight; y++) {
-                color = tile.getRGB(x, y);
-                ourColors classifyResult= classify(color);
+                color = image.getPixel(x, y);
+                ourColors classifyResult = classify(color);
                 //System.out.println(tile.hashCode()+""+classifyResult);
-                short colorReturned = (short) classifyResult.ordinal();
+                int colorReturned = (int) classifyResult.ordinal();
                 frequency[colorReturned]++;
                 if(frequency[colorReturned] > maxFrequency) {
-                    mostFrequent = classify(color);
+                    mostFrequent = colorReturned;
                     maxFrequency = frequency[colorReturned];
                 } 
             }
         }
-        if(mostFrequent == ourColors.White || mostFrequent == ourColors.Gray) {
-            //TODO return countBeads(tile);
+        if(mostFrequent == ourColors.White.ordinal() || mostFrequent == ourColors.Gray.ordinal()) {
+            return countBeads(image);
         }
-        System.out.println(mostFrequent);
         return mostFrequent;
     }
 
@@ -118,7 +106,7 @@ public class ImageProcessing {
      * Counts beads in input image using
      * Hough Circle Trasform
      */ 
-    public static int countBeads(BufferedImage image) {
+    public static int countBeads(Bitmap image) {
         return 0;
     }
 
@@ -128,21 +116,10 @@ public class ImageProcessing {
      */
     private static int getSimpleColor(int hex) {
         return 0;
-        //return range(hex2Rgb(new String(hex)));
+        //return classify(hex2Rgb(new String(hex))).ordinal();
     } 
 
-    /*
-     * Functions for testing purposes
-     */
-    private static void test(BufferedImage[] tiles) {
-        for(int i = 0; i < tiles.length; i++) {
-            try {
-                ImageIO.write(tiles[i], "jpg", new File("tile" + i + ".jpg"));
-            } catch (Exception e) {
-                System.out.println("Error in writting tile " + i);
-            }
-        }
-    }
+
 
     public static Color hex2Rgb(String colorStr) {
         return new Color(
@@ -174,7 +151,21 @@ public class ImageProcessing {
         if (hue < 330)  return ourColors.Magenta;
         return ourColors.Red;
     }
-    /*public static void main(String[] args) {
+
+    /*
+      Functions for testing purposes
+
+    private static void test(BufferedImage[] tiles) {
+        for(int i = 0; i < tiles.length; i++) {
+            try {
+                ImageIO.write(tiles[i], "jpg", new File("tile" + i + ".jpg"));
+            } catch (Exception e) {
+                System.out.println("Error in writting tile " + i);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
         File input = new File("sample.jpg");
         try {
             BufferedImage image = ImageIO.read(input);
