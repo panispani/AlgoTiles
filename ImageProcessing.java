@@ -73,7 +73,7 @@ public class ImageProcessing {
         }
         int[] frequency = new int[NUM_COLORS];
         int color;
-        int mostFrequent = 0;
+        ourColors mostFrequent = ourColors.Empty;
         int maxFrequency = 0;
         for(int x = 0; x < tileWidth; x++) {
             for(int y = 0; y < tileHeight; y++) {
@@ -91,6 +91,7 @@ public class ImageProcessing {
         if(mostFrequent == ourColors.White.ordinal() || mostFrequent == ourColors.Gray.ordinal()) {
             return countBeads(image);
         }
+        System.out.println(mostFrequent);
         return mostFrequent;
     }
 
@@ -148,6 +149,36 @@ public class ImageProcessing {
         }
     }
 
+    public static Color hex2Rgb(String colorStr) {
+        return new Color(
+                Integer.valueOf( colorStr.substring( 1, 3 ), 16 ),
+                Integer.valueOf( colorStr.substring( 3, 5 ), 16 ),
+                Integer.valueOf( colorStr.substring( 5, 7 ), 16 ) );
+    }
+    
+    public static ourColors classify(int color)
+    {
+        float[] hsbvals = new float[3];
+
+        Color.RGBtoHSB((color&0xFF0000)>>16, (color&0x00FF00)>>8, (color&0x0000FF)>>0, hsbvals);
+        //System.out.println(((color&0xFF0000)>>16)+"-"+((color&0x00FF00)>>8)+"-"+(color&0x0000FF));
+        float hue = hsbvals[0]*360;
+        float sat = hsbvals[1];
+        float lgt = hsbvals[2];     
+
+       // System.out.println(hue+"-"+lgt+"-"+sat);
+        if (sat < 0.25) return ourColors.Gray;
+        if (lgt < 0.1)  return ourColors.Black;
+        if (lgt > 0.9)  return ourColors.White;
+
+        if (hue < 30)   return ourColors.Red;
+        if (hue < 90)   return ourColors.Yellow;
+        if (hue < 150)  return ourColors.Green;
+        if (hue < 210)  return ourColors.Cyan;
+        if (hue < 270)  return ourColors.Blue;
+        if (hue < 330)  return ourColors.Magenta;
+        return ourColors.Red;
+    }
     public static void main(String[] args) {
         File input = new File("sample.jpg");
         try {
