@@ -29,7 +29,6 @@ public class Createlevel extends AppCompatActivity {
         setContentView(R.layout.activity_createlevel);
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         start();
-
     }
 
     public class type {
@@ -39,6 +38,7 @@ public class Createlevel extends AppCompatActivity {
             this.a=a;
         }
     }
+
     int width = 10;
     int height = 10;
     RelativeLayout r1;
@@ -59,7 +59,6 @@ public class Createlevel extends AppCompatActivity {
     Bitmap flag;
     ImageButton[][]images;
 
-
     public void start(){
         // Array
         images=new ImageButton[height][width];
@@ -78,8 +77,6 @@ public class Createlevel extends AppCompatActivity {
         baground =Bitmap.createScaledBitmap(baground,d.getHeight(),d.getWidth(),false);
         r1.setBackground( getResources().getDrawable(R.drawable.grass));
 
-
-
         int size = d.getWidth();
 
         bomb = BitmapFactory.decodeResource(this.getResources(),R.drawable.bomb);
@@ -90,7 +87,6 @@ public class Createlevel extends AppCompatActivity {
 
         rock = BitmapFactory.decodeResource(this.getResources(),R.drawable.rock);
         rock = Bitmap.createScaledBitmap(rock,size/height,size/width,false);
-
 
         player0 = BitmapFactory.decodeResource(this.getResources(),R.drawable.player0);
         player0 = Bitmap.createScaledBitmap(player0,size/height,size/width,false);
@@ -106,10 +102,6 @@ public class Createlevel extends AppCompatActivity {
 
         flag = BitmapFactory.decodeResource(this.getResources(),R.drawable.flag);
         flag = Bitmap.createScaledBitmap(flag,size/height,size/width,false);
-
-
-
-
 
         for (int x=0; x < height; x++){
             for (int y = 0; y < width; y++){
@@ -131,7 +123,6 @@ public class Createlevel extends AppCompatActivity {
                             switch (t.a){
                                 case grassC:
                                     IB.setTag(new type(rockC));
-
                                     IB.setImageBitmap(rock);
 
                                     break;
@@ -148,7 +139,6 @@ public class Createlevel extends AppCompatActivity {
                                 case flagC:
                                     IB.setTag(new type(grassC));
                                     IB.setImageBitmap(grass);
-
                                     break;
                             }
                         }
@@ -161,12 +151,8 @@ public class Createlevel extends AppCompatActivity {
                 }
                 images[x][y]=temp;
                 r1.addView(temp);
-
             }
         }
-
-
-
     }
 
     public void SaveLevel(View v){
@@ -189,24 +175,8 @@ public class Createlevel extends AppCompatActivity {
             for (int x=0; x < height; x++){
                 for (int y = 0; y < width; y++){
                     type t=(type)images[x][y].getTag();
+                    outputStream.write(t.a);
 
-                    switch (t.a){
-                        case grassC:
-                            outputStream.write((grassC+" ").getBytes());
-                            break;
-                        case rockC:
-                            outputStream.write((rockC+" ").getBytes());
-                            break;
-                        case bombC:
-                            outputStream.write((bombC+" ").getBytes());
-                            break;
-                        case flagC:
-                            outputStream.write((flagC+" ").getBytes());
-                            break;
-                        case playerC:
-                            outputStream.write((playerC+" ").getBytes());
-                            break;
-                    }
                 }
             }
             outputStream.close();

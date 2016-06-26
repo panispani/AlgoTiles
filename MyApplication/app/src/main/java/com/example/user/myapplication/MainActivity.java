@@ -1,5 +1,6 @@
 package com.example.user.myapplication;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -13,12 +14,17 @@ import android.os.Handler;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.sql.SQLOutput;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import java.util.Random;
@@ -33,16 +39,21 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         this.imageView = (ImageView) this.findViewById(R.id.imageView1);
         Button photoButton = (Button) this.findViewById(R.id.button1);
-        Button start = (Button) this.findViewById(R.id.start);
+        final Button start = (Button) this.findViewById(R.id.start);
+
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         start();
-        //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
+        SaveLevel();
         photoButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+
+
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
@@ -51,10 +62,13 @@ public class MainActivity extends Activity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                start.setEnabled(false);
                 TextView t = (TextView) findViewById(R.id.textView);
                 t.setText("");
-                moves.add(new MyPoint(0,0,dir));
+                resetGame();
+
+                moves.add(new MyPoint(playerX,playerY,dir));
+
                 fun(0);
 
                 final Handler handler = new Handler();
@@ -80,18 +94,30 @@ public class MainActivity extends Activity {
                         }
 
                         moves.remove(0);
-                        if( moves.size()>1 )
-                            handler.postDelayed(this,500);
+                        if( moves.size()>1 ){
+                           handler.postDelayed(this,500);}
+                        else{
+                            if(status==1){
+                                images[point.x][point.y].setImageBitmap(yheaaaa);
+                            }
+                            else if(status==2)                            {
+                                images[point.x][point.y].setImageBitmap(fireeee);
+                            }
+                            status=0;
+                            start.setEnabled(true);
+                        }
                     }
                 },500);
             }
         });
     }
 
+    int status=0;
+
     int dir=0;
     int[] ar;
     int lastIndex=8;
-
+    Button play;
     @Override
     protected void onStart(){
         super.onStart();
@@ -103,7 +129,7 @@ public class MainActivity extends Activity {
 
     private void setLastIndex() {
         int index = ImageProcessing.TILES_ROW * ImageProcessing.TILES_COL - 1;
-        while(isNumber(ar[index - 1])) {
+        while(index >= 0 && isNumber(ar[index])) {
             index--;
         }
         lastIndex = index;
@@ -112,28 +138,82 @@ public class MainActivity extends Activity {
     private boolean isNumber(int id) {
         return id >= NUMBER;
     }
-
+    String level="level0";
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
 
             ar = ImageProcessing.run(photo);
+
             setLastIndex();
+
+            if(checkBalanced()){
+                play.setEnabled(true);
+            }
+            else{
+                play.setEnabled(false);
+            }
         }
+
     }
 
+
+    public boolean checkBalanced(){
+        int total=0;
+        for(int i=0;i<=lastIndex;i++){
+            if(ar[i]==IF || ar[i]==FOR){
+                if(ar[i+1]-NUMBER<0||ar[i+1]-NUMBER>9){
+                    notBalanced(-i);
+                    return false;
+                }
+                else{
+                    i++;
+                    total++;
+                    continue;
+                }
+            }
+            if(ar[i]-NUMBER>0&&ar[i]-NUMBER<=9){
+                notBalanced(-i);
+                return false;
+            }
+            else if(ar[i]==END){
+                if(total<=0){
+                    notBalanced(i);
+                    return false;
+                }
+                else
+                    total--;
+            }
+        }
+        TextView et = (TextView) findViewById(R.id.textView);
+        et.setText("Syntax Ok");
+        return true;
+    }
+    public void notBalanced(int e){
+        TextView et = (TextView) findViewById(R.id.textView);
+       if(e==-100)
+        et.setText("You did not close all functions");
+        else if(e>0){
+           et.setText("Not Balanced square: "+e);
+       }
+           else if(e<0){
+           et.setText("After for/if must follow number: "+(-e));
+        }
+    }
     int width = 10;
     int height = 10;
     RelativeLayout r1;
     ImageView temp;
-    int bombC=0;
-    int grassC=1;
-    int rockC=2;
-    int playerC =3;
-    int flagC =4;
+    final int bombC=0;
+    final int grassC=1;
+    final int rockC=2;
+    final int playerC =3;
+    final int flagC =4;
 
     int Array[][];
     Bitmap bomb;
+    Bitmap photo;
     Bitmap grass;
     Bitmap rock;
     Bitmap player0;
@@ -141,6 +221,8 @@ public class MainActivity extends Activity {
     Bitmap player2;
     Bitmap player3;
     Bitmap flag;
+    Bitmap fireeee;
+    Bitmap yheaaaa;
     ImageView[][] images;
     int playerX = 0;
     int playerY = 0;
@@ -175,9 +257,15 @@ public class MainActivity extends Activity {
         r1 = (RelativeLayout) findViewById(R.id.rl);
         r1.setBackground( getResources().getDrawable(R.drawable.grass));
         Display d = getWindowManager().getDefaultDisplay();
+        play = (Button)findViewById(R.id.start);
+    
+        int size = d.getWidth();
 
+        fireeee = BitmapFactory.decodeResource(this.getResources(),R.drawable.fireeee);
+        fireeee = Bitmap.createScaledBitmap(fireeee,size/height,size/width,false);
 
-        int size = d.getWidth()/2;
+        yheaaaa = BitmapFactory.decodeResource(this.getResources(),R.drawable.yheaaaa);
+        yheaaaa = Bitmap.createScaledBitmap(yheaaaa,size/height,size/width,false);
 
         bomb = BitmapFactory.decodeResource(this.getResources(),R.drawable.bomb);
         bomb = Bitmap.createScaledBitmap(bomb,size/height,size/width,false);
@@ -214,11 +302,9 @@ public class MainActivity extends Activity {
 
                 if (Array [x][y] == bombC){
 
-
                     temp.setImageBitmap(bomb);
                 }
                 if (Array [x][y] == rockC){
-
 
                     temp.setImageBitmap(rock);
                 }
@@ -238,8 +324,6 @@ public class MainActivity extends Activity {
                         case 3:
                             temp.setImageBitmap(player3);
                             break;
-
-
                     }
                 }
 
@@ -328,7 +412,7 @@ public class MainActivity extends Activity {
         else if(ar[s]==FOR){
             int k=ar[s+1]-NUMBER;
             int e=s;
-            for(int i=0;i<k;i++){
+            for(int i=0;i<k && k >= 0;i++){
                 e = fun(s+2);
                 if(e==-1)
                     return -1;
@@ -338,11 +422,11 @@ public class MainActivity extends Activity {
             if(fun(e + 1) == -1){
                 return -1;
             }
-
         }
 
         else if(ar[s]==IF){
-            if(check(ar[s+1]-NUMBER)==0){
+            int ahead = check(ar[s+1] - NUMBER);
+            if(ahead==grassC || ahead == flagC){
                 int l=fun(s+2);
                 if (l==-1)
                     return -1;
@@ -397,7 +481,7 @@ public class MainActivity extends Activity {
     }
 
 
-    private class MyPoint{
+    private class MyPoint {
         int x,y,dir;
         public MyPoint(int x,int y,int dir){
             this.x = x;
@@ -406,7 +490,6 @@ public class MainActivity extends Activity {
         }
     }
     ArrayList<MyPoint> moves = new ArrayList<MyPoint>();
-
 
     public int check(int num){
         switch (dir){
@@ -421,26 +504,29 @@ public class MainActivity extends Activity {
         }
         return 0;
     }
+
     public int move(){
         int t = check(1);
         if(t==flagC){
             updateCrush();
             return flagC;
         }
-        if(t==bombC){
+        else if(t==bombC){
 
             updateCrush();
             return bombC;
         }
-        if(t==rockC){
+        else if(t==rockC){
             return rockC;
         }
-        if(t==flagC){
+        else if(t==flagC){
             return flagC;
+        }
+        else if (t!=grassC) {
+            return -1;
         }
 
         Array[playerY][playerX]=grassC;
-        //images[playerY][playerX].setImageBitmap(grass);
         switch (dir){
             case 0:
                 playerX++;
@@ -463,23 +549,6 @@ public class MainActivity extends Activity {
     public void updateGame(){
         moves.add(new MyPoint(playerY,playerX,dir));
         Array[playerY][playerX]=playerC;
-        /*
-        switch (dir){
-            case 0:
-                images[playerY][playerX].setImageBitmap(player0);
-                break;
-            case 1:
-                images[playerY][playerX].setImageBitmap(player1);
-                break;
-            case 2:
-                images[playerY][playerX].setImageBitmap(player2);
-                break;
-            case 3:
-                images[playerY][playerX].setImageBitmap(player2);
-                break;
-        }
-        */
-
     }
 
     public int validMoveRight(int z, int move){
@@ -574,35 +643,157 @@ public class MainActivity extends Activity {
     public void loser(){
         TextView t = (TextView) findViewById(R.id.textView);
         t.setText("Loser");
+        status=2;
     }
     public void winner(){
         TextView t = (TextView) findViewById(R.id.textView);
         t.setText("Winner");
+        status=1;
     }
 
     public void updateCrush(){
         Array[playerY][playerX]=grassC;
-        //images[playerY][playerX].setImageBitmap(grass);
         switch (dir){
             case 0:
                 playerX++;
-                //images[playerY][playerX].setImageBitmap(player0);
                 break;
             case 1:
                 playerY++;
-                //images[playerY][playerX].setImageBitmap(player1);
                 break;
             case 2:
                 playerX--;
-                //images[playerY][playerX].setImageBitmap(player2);
                 break;
             case 3:
                 playerY--;
-                //images[playerY][playerX].setImageBitmap(player2);
                 break;
         }
         moves.add(new MyPoint(playerY,playerX,dir));
     }
+    public void resetGame(){
+        while(moves.size()>0){
+            moves.remove(0);
+        }
+        try {
+            FileInputStream fin = openFileInput(level);
+            for(int i=0;i<height;i++){
+                for(int j=0;j<width;j++){
+                    byte[] a = new byte[1];
+                    try {
+                        fin.read(a,0,1);
+                        Array[j][i]=a[0];
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            for (int x=0; x < height; x++){
+                for (int y = 0; y < width; y++){
+                    switch(Array[x][y]){
+                        case rockC:
+                            images[x][y].setImageBitmap(rock);
+                            break;
+                        case playerC:
+                            images[x][y].setImageBitmap(player0);
+                            break;
+                        case grassC:
+                            images[x][y].setImageBitmap(grass);
+                            break;
+                        case bombC:
+                            images[x][y].setImageBitmap(bomb);
+                            break;
+                        case flagC:
+                            images[x][y].setImageBitmap(flag);
+                            break;
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        }
+
+        playerX=0;
+        playerY=0;
+        dir=0;
+
+    }
+    public void loadD(View v){
+        EditText eT = (EditText) findViewById(R.id.editText2);
+
+        String filename = eT.getText().toString();
+        if(filename.length()==0){
+            Context context = getApplicationContext();
+            CharSequence text = "Please enter filename!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
+        try {
+            FileInputStream fin = openFileInput(filename);
+            for(int i=0;i<height;i++){
+                for(int j=0;j<width;j++){
+                    byte[] a = new byte[1];
+                    try {
+                        fin.read(a,0,1);
+                        Array[j][i]=a[0];
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            for (int x=0; x < height; x++){
+                for (int y = 0; y < width; y++){
+                    switch(Array[x][y]){
+                        case rockC:
+                            images[x][y].setImageBitmap(rock);
+                            break;
+                        case playerC:
+                            images[x][y].setImageBitmap(player0);
+                            break;
+                        case grassC:
+                            images[x][y].setImageBitmap(grass);
+                            break;
+                        case bombC:
+                            images[x][y].setImageBitmap(bomb);
+                            break;
+                        case flagC:
+                            images[x][y].setImageBitmap(flag);
+                            break;
+                }
+            }
+            }
+            level=filename;
+        } catch (FileNotFoundException e) {
+            Context context = getApplicationContext();
+            CharSequence text = "File not found";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            e.printStackTrace();
+        }
+
+    }
+    public void SaveLevel(){
 
 
+
+
+        FileOutputStream outputStream;
+
+        try {
+            outputStream = openFileOutput(level, Context.MODE_PRIVATE);
+
+            for (int x=0; x < height; x++){
+                for (int y = 0; y < width; y++){
+                     outputStream.write(Array[y][x]);
+                }
+            }
+            outputStream.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

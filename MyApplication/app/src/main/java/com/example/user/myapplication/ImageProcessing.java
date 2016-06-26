@@ -1,16 +1,28 @@
 package com.example.user.myapplication;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Bitmap;
-import android.graphics.Color;
+
+import org.opencv.android.Utils;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ImageProcessing {
+
+    static{ System.loadLibrary("opencv_java3"); }
 
     /*
      * Tile information, global and specific to
      * the playboard
      */
-    public static int TILES_ROW = 8;
-    public static int TILES_COL = 4;
+    public static int TILES_ROW = 3;
+    public static int TILES_COL = 8;
     public static int NUM_COLORS = 17; // 7 + 10 numbers
 
     public static enum ourColors{
@@ -20,7 +32,7 @@ public class ImageProcessing {
         Green,
         Magenta,
         Yellow,
-        Cyan,
+        Orange,
         Black,
         White,
         Gray
@@ -82,7 +94,7 @@ public class ImageProcessing {
             for(int y = 0 + marginHeight; y < tileHeight - marginHeight; y++) {
                 color = image.getPixel(fromx + x, fromy + y);
                 ourColors classifyResult = classify(color);
-                //System.out.println(tile.hashCode()+""+classifyResult);
+                System.out.println(color+"\n");
                 int colorReturned = (int) classifyResult.ordinal();
                 frequency[colorReturned]++;
                 if(frequency[colorReturned] > maxFrequency) {
@@ -92,7 +104,7 @@ public class ImageProcessing {
             }
         }
         if(mostFrequent == ourColors.White.ordinal() || mostFrequent == ourColors.Gray.ordinal()) {
-            return countBeads(image);
+            return countBeads(Bitmap.createBitmap(image,fromx,fromy,tox-fromx,toy-fromy));
         }
         System.out.println(mostFrequent);
         return mostFrequent;
@@ -103,17 +115,51 @@ public class ImageProcessing {
      * Hough Circle Trasform
      */
     public static int countBeads(Bitmap image) {
-        return 10; //TODO: psalios
-        /*Mat mat = new Mat(image.getHeight(),image.getWidth(),CvType.CV_8U);
-        byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-        mat.put(0, 0, pixels);
-        Mat circles = new Mat();
-        int iCannyUpperThreshold = 10;
-        int iMinRadius = 20;
-        int iMaxRadius = 1000;
-        int iAccumulator = 200;
-        Imgproc.HoughCircles( mat, circles, Imgproc.CV_HOUGH_GRADIENT, 2.0, mat.rows() / 8, iCannyUpperThreshold, iAccumulator, iMinRadius, iMaxRadius);
-        return circles.cols();*/
+            Mat mat = new Mat(image.getWidth(), image.getHeight(), CvType.CV_8UC1);
+            Mat grayMat = new Mat(image.getWidth(), image.getHeight(), CvType.CV_8UC1);
+
+            Utils.bitmapToMat(image, mat);
+
+            /* convert to grayscale */
+            int colorChannels = (mat.channels() == 3) ? Imgproc.COLOR_BGR2GRAY
+                    : ((mat.channels() == 4) ? Imgproc.COLOR_BGRA2GRAY : 1);
+
+            Imgproc.cvtColor(mat, grayMat, colorChannels);
+
+            /* reduce the noise so we avoid false circle detection */
+            Imgproc.GaussianBlur(grayMat, grayMat, new Size(9, 9), 2, 2);
+
+            // accumulator value
+            double dp = 1.0;
+            // minimum distance between the center coordinates of detected circles in pixels
+            double minDist = 2;
+
+            // min and max radii (set these values as you desire)
+            int minRadius = 0, maxRadius = 10000;
+
+            // param1 = gradient value used to handle edge detection
+            // param2 = Accumulator threshold value for the
+            // cv2.CV_HOUGH_GRADIENT method.
+            // The smaller the threshold is, the more circles will be
+            // detected (including false circles).
+            // The larger the threshold is, the more circles will
+            // potentially be returned.
+            double param1 = 10, param2 = 10;
+
+            /* create a Mat object to store the circles detected */
+            Mat circles = new Mat(image.getWidth(), image.getHeight(), CvType.CV_8UC1);
+
+            //List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+            //Imgproc.findContours(grayMat,contours,new Mat(), Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
+            /* find the circle in the image */
+            Imgproc.HoughCircles(grayMat, circles,
+                    Imgproc.CV_HOUGH_GRADIENT, dp, minDist, param1,
+                    param2, minRadius, maxRadius);
+
+            /* get the number of circles detected */
+            int numberOfCircles = (circles.rows() == 0) ? 0 : circles.cols();
+            //numberOfCircles %= 11; //max number allowed is 10
+            return 8 + numberOfCircles; //index of 0 is 8
     }
 
     /*
@@ -128,16 +174,17 @@ public class ImageProcessing {
         float sat = hsbvals[1];
         float lgt = hsbvals[2];
 
-        if (lgt < 0.15)  return ourColors.Black;
+        if (lgt < 0.25)  return ourColors.Black;
         if (lgt > 0.7 && sat < 0.3) return ourColors.White;
-        if (sat < 0.25) return ourColors.Gray;
+        if (sat < 0.25 && lgt > 0.5) return ourColors.Gray;
 
-        if (hue < 25)   return ourColors.Red;
-        if (hue < 75)   return ourColors.Yellow;
-        if (hue < 141)  return ourColors.Green;
-        if (hue < 200)  return ourColors.Cyan;
-        if (hue < 250   )  return ourColors.Blue;
-        if (hue < 320)  return ourColors.Magenta;
+        if (hue < 40)   return ourColors.Red;
+        if (hue < 50)  return ourColors.Orange;
+        if (hue < 65)   return ourColors.Yellow;
+        if (hue < 160)  return ourColors.Green;
+
+        if (hue < 250)  return ourColors.Blue;
+        if (hue < 345)  return ourColors.Magenta;
         else return ourColors.Red;
     }
 

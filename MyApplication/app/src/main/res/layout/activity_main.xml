@@ -9,7 +9,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="LOAD PIC"
         android:id="@+id/button1"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
@@ -25,10 +25,11 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="PLAY"
         android:id="@+id/start"
         android:layout_above="@+id/button1"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:enabled="false" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -37,4 +38,22 @@
         android:id="@+id/textView"
         android:layout_above="@+id/start"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LOAD DES"
+        android:id="@+id/load"
+        android:layout_alignParentBottom="true"
+        android:layout_alignEnd="@+id/button1"
+        android:layout_toEndOf="@+id/imageView1"
+        android:onClick="loadD" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText2"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/load" />
+
 </RelativeLayout>
