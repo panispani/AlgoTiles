@@ -17,7 +17,7 @@ Our app is currently on version 63.0. Take that Google Chrome :)
 Enjoy!
 
 
-*That was a joke.. for now :) 
+\*That was a joke.. for now :) 
 **Step 0:** Cut your papers into tiles of the same size. Add them into A3 paper (8x4)
 ![Step 0](/doc-images/step0.jpg "Cut your papers into tiles of the same size. Add them into A3 paper (8x4)")
 **Step 1:** Open AlgoTiles app!
