@@ -6,7 +6,7 @@
 
 AlgoTiles is an awesome app for kids to learn programming. It was created in less than 48 hours during Hackathon Cyprus 2016.
 
-![AlgoTiles screenshot](/docs-images/screenshot.jpg "AlgoTiles screenshot")
+![AlgoTiles screenshot](/doc-images/screenshot.jpg "AlgoTiles screenshot")
 
 For a Ultra High Definition demonstration we have added a gif below [TODO] and a few photos at the end.
 
@@ -21,12 +21,12 @@ Enjoy!
 
 *That was a joke.. for now :) 
 
-![Step 0](/docs-images/step0.jpg "Cut your papers into tiles of the same size. Add them into A3 paper (8x4)")
+![Step 0](/doc-images/step0.jpg "Cut your papers into tiles of the same size. Add them into A3 paper (8x4)")
 
-![Step 1](/docs-images/step1.jpg "Open AlgoTiles app!")
+![Step 1](/doc-images/step1.jpg "Open AlgoTiles app!")
 
-![Step 2](/docs-images/step2.jpg "Press *Take Photo* button and take a photo of your *Solution* on the app")
+![Step 2](/doc-images/step2.jpg "Press *Take Photo* button and take a photo of your *Solution* on the app")
 
-![Step 2](/docs-images/step2-board.jpg "Your photo should be something similar to that.")
+![Step 2](/doc-images/step2-board.jpg "Your photo should be something similar to that.")
 
-![Step 3](/docs-images/step3.jpg "Load the picture and the solution will run!. It will tell you if ")
+![Step 3](/doc-images/step3.jpg "Load the picture and the solution will run!. It will tell you if ")
