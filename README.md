@@ -18,13 +18,13 @@ Enjoy!
 
 
 *That was a joke.. for now :) 
-
+**Step 0: **Cut your papers into tiles of the same size. Add them into A3 paper (8x4)
 ![Step 0](/doc-images/step0.jpg "Cut your papers into tiles of the same size. Add them into A3 paper (8x4)")
-
+**Step 1: **Open AlgoTiles app!
 ![Step 1](/doc-images/step1.jpg "Open AlgoTiles app!")
-
+**Step 2.a: **Press *Take Photo* button and take a photo of your *Solution* on the app
 ![Step 2](/doc-images/step2.jpg "Press *Take Photo* button and take a photo of your *Solution* on the app")
-
+**Step 2.b: **Your photo should be something similar to that.
 ![Step 2](/doc-images/step2-board.jpg "Your photo should be something similar to that.")
-
-![Step 3](/doc-images/step-3.jpg "Load the picture and the solution will run!. It will tell you if ")
+**Step 3: **Load the picture and watch your agent execute your commands and move on the labyrinth!.
+![Step 3](/doc-images/step-3.jpg "Load the picture and watch your agent execute your commands and move on the labyrinth!.")
