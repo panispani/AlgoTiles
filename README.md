@@ -20,7 +20,7 @@ Enjoy!
 \*That was a joke.. for now :)
 
 **Step 0:** Cut your papers into tiles of the same size. Add them into A3 paper (8x4)
-![Step 0](/doc-images/step0.jpg "Cut your papers into tiles of the same size. Add them into A3 paper (8x4)")
+![Step 0](/doc-images/step0.jpg "Cut your papers into tiles of the same size. Add them on top of an A3 paper sheet (8x4)")
 **Step 1:** Open AlgoTiles app!
 ![Step 1](/doc-images/step1.jpg "Open AlgoTiles app!")
 **Step 2.a:** Press *Take Photo* button and take a photo of your *Solution* on the app
