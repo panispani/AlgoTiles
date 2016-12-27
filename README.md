@@ -4,12 +4,12 @@
 
 AlgoTiles is an awesome app for kids to learn programming. It was created in less than 48 hours during Hackathon Cyprus 2016.
 
-It was created by 
-[Panayiotis Panayiotou](https://uk.linkedin.com/in/panayiotis-panayiotou-905437108)  
-[Andreas Loizou](https://cy.linkedin.com/in/loizouandreas)  
-[Michalis Psalios](https://uk.linkedin.com/in/michalis-psalios-61b873a9)  
-[Constantinos Diomedous](https://github.com/condiom),  
-[Demos Christoforou](https://github.com/demos317)  
+It was created by:  
+* [Panayiotis Panayiotou](https://uk.linkedin.com/in/panayiotis-panayiotou-905437108)  
+* [Andreas Loizou](https://cy.linkedin.com/in/loizouandreas)  
+* [Michalis Psalios](https://uk.linkedin.com/in/michalis-psalios-61b873a9)  
+* [Constantinos Diomedous](https://github.com/condiom),  
+* [Demos Christoforou](https://github.com/demos317)  
 ![AlgoTiles screenshot](/doc-images/screenshot.jpg "AlgoTiles screenshot")  
 
 For an Ultra High Definition demonstration we have added a gif below [TODO] and a few photos at the end.
