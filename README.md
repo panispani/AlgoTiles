@@ -1,6 +1,6 @@
-##Pokemon Coding Monsters present:
+## Pokemon Coding Monsters present:
 
-#AlgoTiles
+# AlgoTiles
 
 AlgoTiles is an awesome app for kids to learn programming. It was created in less than 48 hours during Hackathon Cyprus 2016.
 
